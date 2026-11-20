@@ -31,6 +31,7 @@ export default function App() {
   const [quickPlay, setQuickPlay] = useState(false);
   const [soundOn, setSoundOn] = useState(isSoundOn());
   const [draggedCardId, setDraggedCardId] = useState<string | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const [showLegend, setShowLegend] = useState(false);
   const handRef = useRef<HTMLDivElement>(null);
   const [handOverlap, setHandOverlap] = useState(0);
@@ -332,24 +333,24 @@ export default function App() {
               style={{ marginLeft: index === 0 ? 0 : -handOverlap }}
               onDragStart={(e) => {
                 setDraggedCardId(card.id);
+                setDragOverIndex(null);
                 e.dataTransfer.setData('text/plain', card.id);
                 e.dataTransfer.effectAllowed = 'move';
               }}
               onDragOver={(e) => {
                 e.preventDefault();
-                if (draggedCardId && draggedCardId !== card.id) {
-                  const from = human.hand.findIndex((c) => c.id === draggedCardId);
-                  const to = index;
-                  if (from !== -1 && from !== to) {
-                    const next = [...human.hand];
-                    const [moved] = next.splice(from, 1);
-                    next.splice(to, 0, moved);
-                    reorderHand(next);
-                    setDraggedCardId(card.id);
-                  }
-                }
+                if (!draggedCardId || draggedCardId === card.id) return;
+                if (dragOverIndex === index) return;
+                const from = human.hand.findIndex((c) => c.id === draggedCardId);
+                if (from === -1 || from === index) return;
+                const next = [...human.hand];
+                const [moved] = next.splice(from, 1);
+                next.splice(index, 0, moved);
+                reorderHand(next);
+                setDraggedCardId(card.id);
+                setDragOverIndex(index);
               }}
-              onDragEnd={() => setDraggedCardId(null)}
+              onDragEnd={() => { setDraggedCardId(null); setDragOverIndex(null); }}
               className="cursor-grab active:cursor-grabbing"
             >
               <CardView
