@@ -29,5 +29,17 @@
     "medium": "Moyen",
     "hard": "Difficile",
     "expert": "Expert"
+  },
+  "phases": {
+    "0": "2 séries de 3",
+    "1": "1 série de 3 + 1 suite de 4",
+    "2": "1 série de 4 + 1 suite de 4",
+    "3": "1 suite de 7",
+    "4": "1 suite de 8",
+    "5": "1 suite de 9",
+    "6": "2 séries de 4",
+    "7": "7 cartes d'1 couleur",
+    "8": "1 série de 5 + 1 série de 2",
+    "9": "1 série de 5 + 1 série de 3"
   }
 }

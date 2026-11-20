@@ -29,5 +29,17 @@
     "medium": "Medium",
     "hard": "Hard",
     "expert": "Expert"
+  },
+  "phases": {
+    "0": "2 sets of 3",
+    "1": "1 set of 3 + 1 run of 4",
+    "2": "1 set of 4 + 1 run of 4",
+    "3": "1 run of 7",
+    "4": "1 run of 8",
+    "5": "1 run of 9",
+    "6": "2 sets of 4",
+    "7": "7 cards of 1 color",
+    "8": "1 set of 5 + 1 set of 2",
+    "9": "1 set of 5 + 1 set of 3"
   }
 }

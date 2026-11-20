@@ -101,7 +101,7 @@ export default function App() {
   })();
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white flex flex-col">
+    <div className="min-h-screen bg-slate-900 text-white flex flex-col max-w-6xl mx-auto w-full">
       {/* opponents */}
       <div className="flex gap-2 p-2 overflow-x-auto">
         {opponents.map((o) => (
@@ -116,6 +116,12 @@ export default function App() {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* phase objective */}
+      <div className="mx-4 mt-2 rounded-xl bg-slate-800/80 border border-slate-700 px-4 py-2 text-center">
+        <div className="text-xs text-slate-400">{t('game.phase', { n: human.phaseIndex + 1 })}</div>
+        <div className="text-lg font-bold text-white">{t(`phases.${human.phaseIndex}`)}</div>
       </div>
 
       {/* table */}
