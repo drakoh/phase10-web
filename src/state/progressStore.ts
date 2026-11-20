@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { LEVELS } from '../progression/levels';
+import { loadProgressFromDb, saveProgressToDb } from '../persistence/db';
 
 interface ProgressState {
   xp: number;
@@ -35,6 +36,15 @@ function writeStorage(state: ProgressState) {
       unlocked: state.unlocked,
     }));
   } catch { /* ignore */ }
+  // IndexedDB persistence
+  saveProgressToDb({
+    id: 'main',
+    xp: state.xp,
+    playerLevel: state.playerLevel,
+    currentLevel: state.currentLevel,
+    stars: state.stars,
+    unlocked: state.unlocked,
+  });
 }
 
 export const useProgressStore = create<ProgressState>((set, get) => ({
@@ -43,7 +53,18 @@ export const useProgressStore = create<ProgressState>((set, get) => ({
   currentLevel: 0,
   stars: {},
   unlocked: 1,
-  load: () => {
+  load: async () => {
+    const dbp = await loadProgressFromDb();
+    if (dbp) {
+      set({
+        xp: dbp.xp ?? 0,
+        playerLevel: dbp.playerLevel ?? 1,
+        currentLevel: dbp.currentLevel ?? 0,
+        stars: dbp.stars ?? {},
+        unlocked: dbp.unlocked ?? 1,
+      });
+      return;
+    }
     const s = readStorage();
     set({
       xp: s.xp ?? 0,

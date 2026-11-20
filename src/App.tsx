@@ -2,18 +2,22 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useGameStore } from './state/gameStore';
 import { useProgressStore } from './state/progressStore';
+import { exportProgressJson, importProgressJson } from './persistence/db';
 import { LEVELS } from './progression/levels';
 import { canLayPhase, canHitCard } from './engine/rules';
 import CardView, { CardBack } from './components/Card';
+import { toggleSound, isSoundOn } from './audio/audio';
 import './App.css';
 
 export default function App() {
   const { t, i18n } = useTranslation();
-  const { round, lastScores, gameWinner, startMatch, humanDraw, humanLayPhase, humanHit, humanDiscard, reset } = useGameStore();
+  const { round, lastScores, gameWinner, startMatch, humanDraw, humanLayPhase, humanHit, humanDiscard, reorderHand, reset } = useGameStore();
   const progress = useProgressStore();
   useEffect(() => { progress.load(); }, []);
   const [name, setName] = useState('You');
   const [quickPlay, setQuickPlay] = useState(false);
+  const [soundOn, setSoundOn] = useState(isSoundOn());
+  const [draggedCardId, setDraggedCardId] = useState<string | null>(null);
   const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard' | 'expert'>('easy');
   const [aiCount, setAiCount] = useState(1);
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
@@ -43,6 +47,12 @@ export default function App() {
             }}
           >
             {i18n.language === 'fr' ? 'EN' : 'FR'}
+          </button>
+          <button
+            className="px-2 py-1 rounded bg-slate-700 text-xs ml-2"
+            onClick={() => setSoundOn(toggleSound())}
+          >
+            {soundOn ? '🔊' : '🔇'}
           </button>
         </div>
         <h1 className="text-3xl font-bold">{t('app.title')}</h1>
@@ -111,6 +121,39 @@ export default function App() {
           >
             {quickPlay ? 'Hide quick play' : 'Quick play (custom)'}
           </button>
+
+          <div className="flex gap-2">
+            <button
+              className="text-xs px-2 py-1 rounded bg-slate-700"
+              onClick={async () => {
+                const json = await exportProgressJson();
+                const blob = new Blob([json], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'phase10-progress.json';
+                a.click();
+                URL.revokeObjectURL(url);
+              }}
+            >
+              Export
+            </button>
+            <label className="text-xs px-2 py-1 rounded bg-slate-700 cursor-pointer">
+              Import
+              <input
+                type="file"
+                accept="application/json"
+                className="hidden"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  const text = await file.text();
+                  await importProgressJson(text);
+                  await progress.load();
+                }}
+              />
+            </label>
+          </div>
           {quickPlay && (
             <>
               <select
@@ -214,6 +257,36 @@ export default function App() {
           <div className="text-sm text-green-400">Your phase is laid. Hits allowed.</div>
         )}
 
+        {/* Laid phases / drop targets */}
+        <div className="w-full max-w-3xl flex flex-wrap gap-3 justify-center">
+          {round.players.map((p) => {
+            const laid = round.laid[p.id];
+            if (!laid) return null;
+            return (
+              <div key={p.id} className="bg-slate-800/60 rounded-xl p-2 border border-slate-700">
+                <div className="text-xs text-slate-300 mb-1">{p.name}</div>
+                <div className="flex gap-2 flex-wrap">
+                  {laid.groups.map((g, gi) => (
+                    <div
+                      key={gi}
+                      onDragOver={(e) => e.preventDefault()}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        const cardId = e.dataTransfer.getData('text/plain') || draggedCardId;
+                        if (cardId) humanHit(cardId, p.id, gi);
+                        setDraggedCardId(null);
+                      }}
+                      className="min-w-[70px] h-16 rounded-lg border-2 border-dashed border-slate-500 flex items-center justify-center text-xs text-slate-300 px-2 hover:border-white/60 transition"
+                    >
+                      {g.kind} ×{g.cards.length}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
         {lastScores && (
           <div className="bg-slate-800 rounded p-3 text-sm">
             <div className="font-semibold mb-1">Round over</div>
@@ -226,14 +299,42 @@ export default function App() {
 
       {/* hand */}
       <div className="p-2 bg-slate-800">
-        <div className="flex -space-x-3 overflow-x-auto pb-2 items-end justify-center">
-          {human.hand.map((card) => (
-            <CardView
+        <div
+          className="flex -space-x-3 overflow-x-auto pb-2 items-end justify-center min-h-[120px]"
+          onDragOver={(e) => e.preventDefault()}
+        >
+          {human.hand.map((card, index) => (
+            <div
               key={card.id}
-              card={card}
-              selected={selectedCard === card.id}
-              onClick={() => setSelectedCard(card.id === selectedCard ? null : card.id)}
-            />
+              draggable
+              onDragStart={(e) => {
+                setDraggedCardId(card.id);
+                e.dataTransfer.setData('text/plain', card.id);
+                e.dataTransfer.effectAllowed = 'move';
+              }}
+              onDragOver={(e) => {
+                e.preventDefault();
+                if (draggedCardId && draggedCardId !== card.id) {
+                  const from = human.hand.findIndex((c) => c.id === draggedCardId);
+                  const to = index;
+                  if (from !== -1 && from !== to) {
+                    const next = [...human.hand];
+                    const [moved] = next.splice(from, 1);
+                    next.splice(to, 0, moved);
+                    reorderHand(next);
+                    setDraggedCardId(card.id);
+                  }
+                }
+              }}
+              onDragEnd={() => setDraggedCardId(null)}
+              className="cursor-grab active:cursor-grabbing"
+            >
+              <CardView
+                card={card}
+                selected={selectedCard === card.id}
+                onClick={() => setSelectedCard(card.id === selectedCard ? null : card.id)}
+              />
+            </div>
           ))}
         </div>
         <div className="flex gap-2 mt-2 flex-wrap">

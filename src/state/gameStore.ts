@@ -4,6 +4,7 @@ import { createRound, applyAction, canLayPhase, scoreRound, advancePhases } from
 import { chooseAction } from '../engine/ai';
 import type { Difficulty } from '../engine/ai';
 import { useProgressStore } from './progressStore';
+import { playSfx } from '../audio/audio';
 
 interface MatchConfig {
   humanName: string;
@@ -22,6 +23,7 @@ interface GameStore {
   humanLayPhase: () => void;
   humanHit: (cardId: string, targetPlayerId: string, groupIndex: number) => void;
   humanDiscard: (cardId: string, skipTargetPlayerId?: string) => void;
+  reorderHand: (newHand: any[]) => void;
   runAiTurns: () => void;
   reset: () => void;
 }
@@ -58,6 +60,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!round) return;
     const r = applyAction(round, { type: 'draw', source });
     set({ round: r });
+    playSfx('draw');
     get().runAiTurns();
   },
 
@@ -68,6 +71,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!layout) return;
     const r = applyAction(round, { type: 'layPhase', groups: layout.groups.map((g) => ({ kind: g.kind, cardIds: [...g.cards] })) });
     set({ round: r });
+    playSfx('lay');
     get().runAiTurns();
   },
 
@@ -76,6 +80,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!round) return;
     const r = applyAction(round, { type: 'hit', cardId, targetPlayerId, groupIndex });
     set({ round: r });
+    playSfx('hit');
     get().runAiTurns();
   },
 
@@ -83,6 +88,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const { round, config } = get();
     if (!round) return;
     const r = applyAction(round, { type: 'discard', cardId, skipTargetPlayerId });
+    const discarded = round.players.find((p) => p.id === 'human')?.hand.find((c) => c.id === cardId);
+    playSfx(discarded?.kind === 'skip' ? 'skip' : 'discard');
     // check round over
     if (r.status === 'finished') {
       const scores = scoreRound(r);
@@ -97,6 +104,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const wonGame = !!r.laid[winner] && (winnerPlayer.phaseIndex + 1) >= target;
       if (wonGame) {
         set({ gameWinner: winner });
+        playSfx(winner === 'human' ? 'win' : 'lose');
         if (winner === 'human') {
           const lvl = useProgressStore.getState().currentLevel;
           useProgressStore.getState().completeLevel(lvl, 3);
@@ -147,5 +155,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({ round: current });
   },
 
+  reorderHand: (newHand) => {
+    const { round } = get();
+    if (!round) return;
+    const players = round.players.map((p) => (p.id === 'human' ? { ...p, hand: newHand } : p));
+    set({ round: { ...round, players } });
+  },
   reset: () => set({ round: null, config: null, lastScores: null, gameWinner: null }),
 }));

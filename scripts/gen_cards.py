@@ -96,31 +96,35 @@ for color in ["red","blue","yellow","green"]:
 img = draw_card("blue", "S", "skip", "SKIP")
 img.save(os.path.join(OUT, "S.png"))
 
-# card back
+# card back (distinct: dark indigo with diagonal stripes + big P10)
 back = Image.new("RGBA", (W,H), (0,0,0,0))
-bd = ImageDraw.Draw(back)
-# rounded rect fill
 m = rounded_mask((W,H))
-base = Image.new("RGB",(W,H),(40,40,80))
+base = Image.new("RGB",(W,H),(25,20,60))
 bb = ImageDraw.Draw(base)
-for y in range(H):
-    factor = 1 - (y/H)*0.3
-    bb.line([(0,y),(W,y)], fill=(int(40*factor),int(40*factor),int(90*factor)))
+# diagonal stripes
+for i in range(-H, W+H, 10):
+    bb.line([(i,0),(i+H,H)], fill=(60,50,110), width=6)
+# center glow
+for r in range(60,0,-1):
+    bb.ellipse((W/2-r, H/2-r, W/2+r, H/2+r), fill=(40,30,90))
 back.paste(base,(0,0),m)
 bd2 = ImageDraw.Draw(back)
-bd2.rounded_rectangle((1,1,W-2,H-2), radius=RADIUS, outline=(255,255,255,180), width=2)
-# pattern
-for x in range(0,W,16):
-    for y in range(0,H,16):
-        bd2.ellipse((x,y,x+3,y+3), fill=(255,255,255,60))
-# center logo
+bd2.rounded_rectangle((1,1,W-2,H-2), radius=RADIUS, outline=(255,215,0,220), width=3)
+# inner border
+bd2.rounded_rectangle((10,10,W-11,H-11), radius=RADIUS-4, outline=(255,255,255,80), width=1)
 try:
-    font_logo = ImageFont.truetype("/System/Library/Fonts/Helvetica.ttc", 48)
+    font_logo = ImageFont.truetype("/System/Library/Fonts/Helvetica.ttc", 64)
+    font_sub = ImageFont.truetype("/System/Library/Fonts/Helvetica.ttc", 16)
 except Exception:
     font_logo = ImageFont.load_default()
+    font_sub = ImageFont.load_default()
 bbox = bd2.textbbox((0,0),"P10",font=font_logo)
 tw=bbox[2]-bbox[0]; th=bbox[3]-bbox[1]
-bd2.text(((W-tw)/2,(H-th)/2),"P10",font=font_logo,fill=(255,255,255,200))
+bd2.text(((W-tw)/2,(H-th)/2),"P10",font=font_logo,fill=(255,215,0,230))
+sub = "PHASE 10"
+bbox2 = bd2.textbbox((0,0),sub,font=font_sub)
+tw2=bbox2[2]-bbox2[0]
+bd2.text(((W-tw2)/2, (H-th)/2 + th + 6), sub, font=font_sub, fill=(255,255,255,160))
 back.save(os.path.join(OUT, "BACK.png"))
 
 print("done")
