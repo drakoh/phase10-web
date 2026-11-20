@@ -9,8 +9,8 @@ function cardSrc(card: any): string {
 
 export function CardView({ card, selected, onClick, small }: { card: any; selected?: boolean; onClick?: () => void; small?: boolean }) {
   const size = small
-    ? 'w-14 h-20 sm:w-16 sm:h-22'
-    : 'w-20 h-28 sm:w-24 sm:h-34 md:w-28 md:h-40';
+    ? 'w-12 h-16 sm:w-14 sm:h-20'
+    : 'w-16 h-22 sm:w-20 sm:h-28 md:w-24 md:h-32';
 
   return (
     <motion.button
@@ -31,8 +31,8 @@ export function CardView({ card, selected, onClick, small }: { card: any; select
 
 export function CardBack({ small }: { small?: boolean }) {
   const size = small
-    ? 'w-14 h-20 sm:w-16 sm:h-22'
-    : 'w-20 h-28 sm:w-24 sm:h-34 md:w-28 md:h-40';
+    ? 'w-12 h-16 sm:w-14 sm:h-20'
+    : 'w-16 h-22 sm:w-20 sm:h-28 md:w-24 md:h-32';
   return (
     <img
       src="/phase10-web/cards/BACK.png"
