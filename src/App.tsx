@@ -297,13 +297,14 @@ export default function App() {
       {/* hand */}
       <div className="p-2 bg-slate-800">
         <div
-          className="flex gap-1 overflow-x-auto pb-1 items-end justify-start min-h-[90px] px-2"
+          className="flex overflow-x-auto pb-1 items-end justify-start min-h-[110px] px-2 pt-4"
           onDragOver={(e) => e.preventDefault()}
         >
           {human.hand.map((card, index) => (
             <div
               key={card.id}
               draggable
+              style={{ marginLeft: index === 0 ? 0 : (human.hand.length > 6 ? -14 : -4) }}
               onDragStart={(e) => {
                 setDraggedCardId(card.id);
                 e.dataTransfer.setData('text/plain', card.id);
