@@ -16,7 +16,7 @@ export function CardView({ card, selected, onClick, small }: { card: any; select
     <motion.button
       layout
       whileTap={{ scale: 0.92 }}
-      whileHover={{ y: -12, scale: 1.06, zIndex: 50 }}
+      whileHover={{ y: -8, scale: 1.05, zIndex: 50 }}
       initial={{ opacity: 0, scale: 0.7, y: 30 }}
       animate={{ opacity: 1, scale: 1, y: selected ? -14 : 0, rotate: selected ? 2 : 0 }}
       transition={{ type: 'spring', stiffness: 380, damping: 26 }}

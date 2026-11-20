@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useGameStore } from './state/gameStore';
 import { useProgressStore } from './state/progressStore';
@@ -6,6 +6,7 @@ import { exportProgressJson, importProgressJson } from './persistence/db';
 import { LEVELS } from './progression/levels';
 import { canLayPhase, canHitCard } from './engine/rules';
 import CardView, { CardBack } from './components/Card';
+import Legend from './components/Legend';
 import { toggleSound, isSoundOn } from './audio/audio';
 import './App.css';
 
@@ -14,10 +15,25 @@ export default function App() {
   const { round, lastScores, gameWinner, startMatch, humanDraw, humanLayPhase, humanHit, humanDiscard, reorderHand, reset } = useGameStore();
   const progress = useProgressStore();
   useEffect(() => { progress.load(); }, []);
+  useEffect(() => {
+    const el = handRef.current;
+    if (!el || !round) return;
+    const humanP = round.players.find((p) => p.id === 'human');
+    if (!humanP || humanP.hand.length <= 1) { setHandOverlap(0); return; }
+    const cardEl = el.querySelector('div');
+    const cardWidth = cardEl ? cardEl.clientWidth : 80;
+    const available = el.clientWidth;
+    const total = humanP.hand.length * cardWidth;
+    if (total <= available) setHandOverlap(0);
+    else setHandOverlap((total - available) / (humanP.hand.length - 1));
+  }, [round]);
   const [name, setName] = useState('You');
   const [quickPlay, setQuickPlay] = useState(false);
   const [soundOn, setSoundOn] = useState(isSoundOn());
   const [draggedCardId, setDraggedCardId] = useState<string | null>(null);
+  const [showLegend, setShowLegend] = useState(false);
+  const handRef = useRef<HTMLDivElement>(null);
+  const [handOverlap, setHandOverlap] = useState(0);
   const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard' | 'expert'>('easy');
   const [aiCount, setAiCount] = useState(1);
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
@@ -35,7 +51,7 @@ export default function App() {
   }
 
   if (!round) {
-    return (
+    return (<>
       <div className="min-h-screen bg-slate-900 text-white flex flex-col items-center justify-center p-6 gap-4 relative">
         <div className="absolute top-4 right-4">
           <button
@@ -53,6 +69,12 @@ export default function App() {
             onClick={() => setSoundOn(toggleSound())}
           >
             {soundOn ? '🔊' : '🔇'}
+          </button>
+          <button
+            className="px-2 py-1 rounded bg-slate-700 text-xs ml-2"
+            onClick={() => setShowLegend(true)}
+          >
+            ?
           </button>
         </div>
         <h1 className="text-3xl font-bold">{t('app.title')}</h1>
@@ -186,7 +208,8 @@ export default function App() {
         </div>
         {gameWinner && <p className="text-green-400">Winner: {gameWinner}</p>}
       </div>
-    );
+      {showLegend && <Legend onClose={() => setShowLegend(false)} />}
+    </>);
   }
 
   const human = round.players.find((p) => p.id === 'human')!;
@@ -210,6 +233,7 @@ export default function App() {
   })();
 
   return (
+    <>
     <div className="h-screen bg-slate-900 text-white flex flex-col max-w-6xl mx-auto w-full overflow-hidden">
       {/* opponents */}
       <div className="flex gap-2 p-1 overflow-x-auto shrink-0">
@@ -297,14 +321,15 @@ export default function App() {
       {/* hand */}
       <div className="p-2 bg-slate-800">
         <div
-          className="flex overflow-x-auto pb-1 items-end justify-start min-h-[110px] px-2 pt-4"
+          ref={handRef}
+          className="flex pb-1 items-end justify-center min-h-[110px] px-2 pt-6"
           onDragOver={(e) => e.preventDefault()}
         >
           {human.hand.map((card, index) => (
             <div
               key={card.id}
               draggable
-              style={{ marginLeft: index === 0 ? 0 : (human.hand.length > 6 ? -14 : -4) }}
+              style={{ marginLeft: index === 0 ? 0 : -handOverlap }}
               onDragStart={(e) => {
                 setDraggedCardId(card.id);
                 e.dataTransfer.setData('text/plain', card.id);
@@ -377,11 +402,19 @@ export default function App() {
           >
             Quit
           </button>
+          <button
+            className="px-2 py-1 rounded bg-slate-700 text-xs"
+            onClick={() => setShowLegend(true)}
+          >
+            ?
+          </button>
         </div>
         <div className="text-[10px] text-slate-400 mt-0.5 truncate">
           {t('game.turn', { name: round.players[round.currentPlayerIndex].name, step: round.turnStep })} {isHumanTurn ? '' : '— AI'}
         </div>
       </div>
     </div>
+    {showLegend && <Legend onClose={() => setShowLegend(false)} />}
+    </>
   );
 }
