@@ -36,7 +36,7 @@ export default function Legend({ onClose }: { onClose: () => void }) {
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
-          className="bg-slate-900 border border-slate-700 rounded-2xl max-w-3xl w-full max-h-[85vh] overflow-y-auto p-4"
+          className="bg-slate-900 text-white border border-slate-700 rounded-2xl max-w-3xl w-full max-h-[85vh] overflow-y-auto p-4"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex items-center justify-between mb-3">

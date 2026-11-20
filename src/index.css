@@ -9,6 +9,8 @@ html, body, #root {
 body {
   font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
+  background: #0f172a;
+  color: #f8fafc;
 }
 
 #root {
