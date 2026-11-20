@@ -1,0 +1,33 @@
+{
+  "app": {
+    "title": "Phase 10 Web",
+    "tagline": "Une version web mobile de Phase 10. Installable, jouable hors ligne."
+  },
+  "home": {
+    "namePlaceholder": "Votre nom",
+    "start": "Commencer",
+    "opponents": "{{count}} adversaire",
+    "opponents_plural": "{{count}} adversaires"
+  },
+  "game": {
+    "draw": "Piocher",
+    "discardPile": "Défausse",
+    "layPhase": "Poser la phase",
+    "discardSelected": "Défausser la sélection",
+    "quit": "Quitter",
+    "turn": "Tour : {{name}} ({{step}})",
+    "phase": "Phase {{n}}",
+    "cards": "{{count}} cartes",
+    "laid": "Posée",
+    "skipped": "Passé",
+    "yourPhaseLaid": "Votre phase est posée. Vous pouvez ajouter des cartes.",
+    "roundOver": "Manche terminée",
+    "pts": "pts"
+  },
+  "difficulty": {
+    "easy": "Facile",
+    "medium": "Moyen",
+    "hard": "Difficile",
+    "expert": "Expert"
+  }
+}

@@ -364,6 +364,6 @@ export function isRoundOver(state: RoundState): boolean {
 }
 
 // re-export for convenience
-export { PHASES, phaseRequirements } from './phases';
+export { PHASES, phaseRequirements, canHitCard } from './phases';
 export type { PhaseGroup, PhaseInstance } from './phases';
 export type { Color } from './cards';

@@ -1,0 +1,33 @@
+{
+  "app": {
+    "title": "Phase 10 Web",
+    "tagline": "A mobile-friendly web version of Phase 10. Installable, offline-ready."
+  },
+  "home": {
+    "namePlaceholder": "Your name",
+    "start": "Start Game",
+    "opponents": "{{count}} opponent",
+    "opponents_plural": "{{count}} opponents"
+  },
+  "game": {
+    "draw": "Draw",
+    "discardPile": "Discard",
+    "layPhase": "Lay Phase",
+    "discardSelected": "Discard Selected",
+    "quit": "Quit",
+    "turn": "Turn: {{name}} ({{step}})",
+    "phase": "Phase {{n}}",
+    "cards": "{{count}} cards",
+    "laid": "Laid",
+    "skipped": "Skipped",
+    "yourPhaseLaid": "Your phase is laid. Hits allowed.",
+    "roundOver": "Round over",
+    "pts": "pts"
+  },
+  "difficulty": {
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard",
+    "expert": "Expert"
+  }
+}
