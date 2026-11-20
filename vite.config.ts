@@ -13,6 +13,7 @@ export default defineConfig({
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'icons/*.png'],
       manifest: {
         name: 'Phase 10 Web',
+        id: '/phase10-web/',
         short_name: 'Phase10',
         description: 'A mobile-first web version of the Phase 10 card game.',
         theme_color: '#1e3a8a',
