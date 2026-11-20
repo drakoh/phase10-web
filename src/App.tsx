@@ -278,7 +278,9 @@ export default function App() {
         </div>
 
         {round.laid.human && (
-          <div className="text-sm text-green-400">Your phase is laid. Hits allowed.</div>
+          <div className="text-xs text-green-400">
+            Phase laid. Discard or hit cards to go out. To hit: select a card that fits a laid phase, then tap Hit (or drag it onto a phase).
+          </div>
         )}
 
         {/* Laid phases / drop targets (compact) */}
@@ -409,6 +411,9 @@ export default function App() {
             ?
           </button>
         </div>
+        {selectedCard && !hitTarget && round.laid.human && (
+          <div className="text-[10px] text-amber-400">Selected card doesn't fit any laid phase.</div>
+        )}
         <div className="text-[10px] text-slate-400 mt-0.5 truncate">
           {t('game.turn', { name: round.players[round.currentPlayerIndex].name, step: round.turnStep })} {isHumanTurn ? '' : '— AI'}
         </div>
