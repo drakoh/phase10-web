@@ -16,8 +16,8 @@ export function CardView({ card, selected, onClick, small }: { card: any; select
 
   const label = card.kind === 'number' ? card.value : card.kind === 'wild' ? 'W' : 'S';
   const size = small
-    ? 'w-12 h-16 sm:w-14 sm:h-20 text-base sm:text-lg'
-    : 'w-16 h-24 sm:w-20 sm:h-28 md:w-24 md:h-32 text-2xl sm:text-3xl';
+    ? 'w-14 h-20 sm:w-16 sm:h-22 text-lg sm:text-xl'
+    : 'w-20 h-28 sm:w-24 sm:h-34 md:w-28 md:h-40 text-3xl sm:text-4xl';
 
   return (
     <motion.button
