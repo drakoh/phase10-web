@@ -144,7 +144,7 @@ export default function App() {
                 startMatch({ humanName: name, difficulty: cfg.difficulty, aiCount: cfg.aiCount, targetPhases: cfg.phases });
               }}
             >
-              Play Level {progress.currentLevel + 1}
+              {t('home.playLevel', { n: progress.currentLevel + 1 })}
             </button>
             <div className="flex justify-between mt-2">
               <button

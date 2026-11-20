@@ -10,7 +10,8 @@
     "opponents_plural": "{{count}} adversaires",
     "quickPlay": "Partie libre (personnalisée)",
     "hideQuickPlay": "Masquer",
-    "customGame": "Partie personnalisée"
+    "customGame": "Partie personnalisée",
+    "playLevel": "Jouer niveau {{n}}"
   },
   "game": {
     "draw": "Piocher",
