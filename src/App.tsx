@@ -35,6 +35,7 @@ export default function App() {
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const [showLegend, setShowLegend] = useState(false);
   const [showRules, setShowRules] = useState(false);
+  const [hint, setHint] = useState<string | null>(null);
   const handRef = useRef<HTMLDivElement>(null);
   const [handOverlap, setHandOverlap] = useState(0);
   const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard' | 'expert'>('easy');
@@ -424,6 +425,51 @@ export default function App() {
             Phases
           </button>
           <button
+            className="px-2 py-1 rounded bg-amber-700 text-xs"
+            onClick={() => {
+              if (!round) return;
+              if (round.turnStep === 'draw') {
+                const top = round.discardPile.length ? round.discardPile[round.discardPile.length - 1] : null;
+                setHint(top && top.kind !== 'skip' ? 'Hint: consider taking the discard pile card if it helps your phase.' : 'Hint: draw from the draw pile.');
+                return;
+              }
+              const layout = canLayPhase(round, 'human');
+              if (layout && !round.laid.human) {
+                setHint('Hint: you can lay your phase now!');
+                return;
+              }
+              // find a hit
+              if (round.laid.human) {
+                for (const c of human.hand) {
+                  for (const t of round.players) {
+                    const tl = round.laid[t.id];
+                    if (!tl) continue;
+                    for (let gi = 0; gi < tl.groups.length; gi++) {
+                      if (canHitCard(c, tl.groups[gi])) {
+                        setHint(`Hint: hit ${c.kind === 'number' ? c.value : c.kind} on ${t.id === 'human' ? 'your' : t.name + "'s"} phase.`);
+                        return;
+                      }
+                    }
+                  }
+                }
+              }
+              // suggest discard lowest
+              const candidates = human.hand.filter((c) => c.kind !== 'skip' || true);
+              if (candidates.length) {
+                const worst = [...candidates].sort((a, b) => {
+                  const pa = a.kind === 'number' ? a.value : a.kind === 'skip' ? 15 : 25;
+                  const pb = b.kind === 'number' ? b.value : b.kind === 'skip' ? 15 : 25;
+                  return pa - pb;
+                })[0];
+                setHint(`Hint: discard ${worst.kind === 'number' ? worst.value : worst.kind} (${worst.kind === 'number' ? worst.color : ''}).`);
+              } else {
+                setHint('Hint: no obvious move.');
+              }
+            }}
+          >
+            Hint
+          </button>
+          <button
             className="px-2 py-1 rounded bg-slate-700 text-xs"
             onClick={() => setShowRules(true)}
           >
@@ -432,6 +478,9 @@ export default function App() {
         </div>
         {selectedCard && !hitTarget && round.laid.human && (
           <div className="text-[10px] text-amber-400">Selected card doesn't fit any laid phase.</div>
+        )}
+        {hint && (
+          <div className="text-[10px] text-blue-300">{hint} <button className="underline" onClick={() => setHint(null)}>dismiss</button></div>
         )}
         <div className="text-[10px] text-slate-400 mt-0.5 truncate">
           {t('game.turn', { name: round.players[round.currentPlayerIndex].name, step: round.turnStep })} {isHumanTurn ? '' : '— AI'}

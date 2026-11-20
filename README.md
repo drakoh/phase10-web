@@ -21,6 +21,12 @@ which builds and deploys to GitHub Pages.
 
 Live URL: https://drakoh.github.io/phase10-web/
 
+## Access on your phone
+
+Scan this QR code to open the app on your phone (no typing needed):
+
+![QR code to open Phase 10 Web](public/qr.png)
+
 ## License / Disclaimer
 
 Fan project. Phase 10® is a trademark of Mattel. Not affiliated with or endorsed by Mattel.
