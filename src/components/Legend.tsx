@@ -21,7 +21,7 @@ const EXAMPLES: { phase: number; cards: any[] }[] = [
   { phase: 9, cards: [C('number',6,'red','a'),C('number',6,'blue','b'),C('number',6,'green','c'),C('number',6,'yellow','d'),C('number',6,'red','e'),C('number',10,'red','f'),C('number',10,'blue','g'),C('number',10,'green','h')] },
 ];
 
-export default function Legend({ onClose }: { onClose: () => void }) {
+export default function Legend({ onClose, currentPhase }: { onClose: () => void; currentPhase?: number }) {
   const { t } = useTranslation();
   return (
     <AnimatePresence>
@@ -44,18 +44,25 @@ export default function Legend({ onClose }: { onClose: () => void }) {
             <button className="px-3 py-1 rounded bg-slate-700 text-sm" onClick={onClose}>Close</button>
           </div>
           <div className="flex flex-col gap-4">
-            {EXAMPLES.map((ex) => (
-              <div key={ex.phase} className="bg-slate-800/60 rounded-xl p-3">
-                <div className="text-sm font-semibold mb-2">
-                  Phase {ex.phase + 1}: {t(`phases.${ex.phase}`)}
+            {EXAMPLES.map((ex) => {
+              const isCurrent = currentPhase === ex.phase;
+              return (
+                <div
+                  key={ex.phase}
+                  className={`rounded-xl p-3 border ${isCurrent ? 'bg-blue-900/60 border-blue-400' : 'bg-slate-800/60 border-slate-700'}`}
+                >
+                  <div className="text-sm font-semibold mb-2 flex items-center gap-2">
+                    Phase {ex.phase + 1}: {t(`phases.${ex.phase}`)}
+                    {isCurrent && <span className="text-xs px-2 py-0.5 rounded bg-blue-500">Current target</span>}
+                  </div>
+                  <div className="flex flex-wrap gap-1">
+                    {ex.cards.map((c, i) => (
+                      <CardView key={i} card={c} small />
+                    ))}
+                  </div>
                 </div>
-                <div className="flex flex-wrap gap-1">
-                  {ex.cards.map((c, i) => (
-                    <CardView key={i} card={c} small />
-                  ))}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </motion.div>
       </motion.div>

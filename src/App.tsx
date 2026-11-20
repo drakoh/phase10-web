@@ -77,7 +77,7 @@ export default function App() {
             className="px-2 py-1 rounded bg-slate-700 text-xs ml-2"
             onClick={() => setShowLegend(true)}
           >
-            ?
+            Phases
           </button>
           <button
             className="px-2 py-1 rounded bg-slate-700 text-xs ml-2"
@@ -421,7 +421,7 @@ export default function App() {
             className="px-2 py-1 rounded bg-slate-700 text-xs"
             onClick={() => setShowLegend(true)}
           >
-            ?
+            Phases
           </button>
           <button
             className="px-2 py-1 rounded bg-slate-700 text-xs"
@@ -438,7 +438,7 @@ export default function App() {
         </div>
       </div>
     </div>
-    {showLegend && <Legend onClose={() => setShowLegend(false)} />}
+    {showLegend && <Legend onClose={() => setShowLegend(false)} currentPhase={human.phaseIndex} />}
     {showRules && <Rules onClose={() => setShowRules(false)} />}
     </>
   );
