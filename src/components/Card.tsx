@@ -30,27 +30,35 @@ export function CardView({ card, selected, onClick, small, size: sizeProp, onMov
       <img src={cardSrc(card)} alt="" className="w-full h-full object-contain pointer-events-none select-none" draggable={false} style={{ imageRendering: 'auto' }} />
       {selected && onMoveLeft && (
         <button
-          className="absolute left-0 top-0 h-full w-5 bg-blue-500/50 hover:bg-blue-500/80"
+          className="absolute left-0 top-0 h-full w-6 flex items-center justify-center text-white text-xs font-bold bg-transparent border-l-2 border-blue-400/80 hover:bg-blue-500/30 hover:border-blue-300"
           onClick={(e) => { e.stopPropagation(); onMoveLeft(); }}
-        />
+        >
+          ◀
+        </button>
       )}
       {selected && onMoveRight && (
         <button
-          className="absolute right-0 top-0 h-full w-5 bg-blue-500/50 hover:bg-blue-500/80"
+          className="absolute right-0 top-0 h-full w-6 flex items-center justify-center text-white text-xs font-bold bg-transparent border-r-2 border-blue-400/80 hover:bg-blue-500/30 hover:border-blue-300"
           onClick={(e) => { e.stopPropagation(); onMoveRight(); }}
-        />
+        >
+          ▶
+        </button>
       )}
       {selected && onMoveUp && (
         <button
-          className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-5 bg-blue-500/50 hover:bg-blue-500/80"
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-6 flex items-center justify-center text-white text-xs font-bold bg-transparent border-t-2 border-blue-400/80 hover:bg-blue-500/30 hover:border-blue-300"
           onClick={(e) => { e.stopPropagation(); onMoveUp(); }}
-        />
+        >
+          ▲
+        </button>
       )}
       {selected && onMoveDown && (
         <button
-          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-5 bg-blue-500/50 hover:bg-blue-500/80"
+          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-6 flex items-center justify-center text-white text-xs font-bold bg-transparent border-b-2 border-blue-400/80 hover:bg-blue-500/30 hover:border-blue-300"
           onClick={(e) => { e.stopPropagation(); onMoveDown(); }}
-        />
+        >
+          ▼
+        </button>
       )}
     </motion.button>
   );
