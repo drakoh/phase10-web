@@ -82,6 +82,24 @@ export default function App() {
           </button>
           <button
             className="px-2 py-1 rounded bg-slate-700 text-xs ml-2"
+            onClick={async () => {
+              try {
+                if ('serviceWorker' in navigator) {
+                  const regs = await navigator.serviceWorker.getRegistrations();
+                  await Promise.all(regs.map((r) => r.unregister()));
+                }
+                if ('caches' in window) {
+                  const keys = await caches.keys();
+                  await Promise.all(keys.map((k) => caches.delete(k)));
+                }
+              } catch { /* ignore */ }
+              window.location.reload();
+            }}
+          >
+            ⟳
+          </button>
+          <button
+            className="px-2 py-1 rounded bg-slate-700 text-xs ml-2"
             onClick={() => setShowRules(true)}
           >
             Rules
@@ -476,6 +494,24 @@ export default function App() {
             onClick={() => setShowRules(true)}
           >
             Rules
+          </button>
+          <button
+            className="px-2 py-1 rounded bg-slate-700 text-xs"
+            onClick={async () => {
+              try {
+                if ('serviceWorker' in navigator) {
+                  const regs = await navigator.serviceWorker.getRegistrations();
+                  await Promise.all(regs.map((r) => r.unregister()));
+                }
+                if ('caches' in window) {
+                  const keys = await caches.keys();
+                  await Promise.all(keys.map((k) => caches.delete(k)));
+                }
+              } catch { /* ignore */ }
+              window.location.reload();
+            }}
+          >
+            ⟳
           </button>
         </div>
         {selectedCard && !hitTarget && round.laid.human && (
