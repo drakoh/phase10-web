@@ -7,13 +7,17 @@
     "namePlaceholder": "Your name",
     "start": "Start Game",
     "opponents": "{{count}} opponent",
-    "opponents_plural": "{{count}} opponents"
+    "opponents_plural": "{{count}} opponents",
+    "quickPlay": "Quick play (custom)",
+    "hideQuickPlay": "Hide quick play",
+    "customGame": "Start Custom Game"
   },
   "game": {
     "draw": "Draw",
     "discardPile": "Discard",
     "layPhase": "Lay Phase",
     "discardSelected": "Discard Selected",
+    "hit": "Hit",
     "quit": "Quit",
     "turn": "Turn: {{name}} ({{step}})",
     "phase": "Phase {{n}}",

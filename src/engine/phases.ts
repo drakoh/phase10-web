@@ -14,6 +14,8 @@ export type GroupKind = 'set' | 'run' | 'color';
 export interface PhaseGroup {
   kind: GroupKind;
   cards: string[]; // card ids
+  /** resolved card objects for rendering */
+  cardObjs?: Card[];
   /** set: the number all cards represent */
   setValue?: number;
   /** run: covered numbers (contiguous range) including wild assignments */
@@ -168,7 +170,7 @@ export function findPhaseLayout(phaseIndex: number, handCards: Card[]): PhaseIns
         else if (req.kind === 'run') res = validateRunGroup(combo, req.minSize);
         else res = validateColorGroup(combo, req.minSize);
         if (!res.ok) continue;
-        const group: PhaseGroup = { kind: req.kind, cards: combo.map((c) => c.id) };
+        const group: PhaseGroup = { kind: req.kind, cards: combo.map((c) => c.id), cardObjs: [...combo] };
         if (req.kind === 'set') group.setValue = res.value;
         if (req.kind === 'run') group.runValues = res.values;
         if (req.kind === 'color') group.colorValue = res.color;
@@ -220,7 +222,7 @@ export function canHitCard(card: Card, group: PhaseGroup): boolean {
 }
 
 export function applyHitToGroup(group: PhaseGroup, card: Card): PhaseGroup {
-  const newGroup: PhaseGroup = { ...group, cards: [...group.cards, (card as { id: string }).id] };
+  const newGroup: PhaseGroup = { ...group, cards: [...group.cards, (card as { id: string }).id], cardObjs: [...(group.cardObjs ?? []), card] };
   if (group.kind === 'set') {
     newGroup.setValue = group.setValue;
   } else if (group.kind === 'color') {

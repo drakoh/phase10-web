@@ -235,7 +235,7 @@ export function applyAction(state: RoundState, action: Action): RoundState {
 
     const groups = action.groups.map((g) => {
       const cs = g.cardIds.map((id) => byId.get(id)!);
-      const grp: PhaseGroup = { kind: g.kind, cards: [...g.cardIds] };
+      const grp: PhaseGroup = { kind: g.kind, cards: [...g.cardIds], cardObjs: [...cs] };
       if (g.kind === 'set') {
         const ns = cs.filter((c) => c.kind === 'number');
         grp.setValue = ns.length ? (ns[0] as { value: number }).value : undefined;

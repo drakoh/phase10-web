@@ -7,6 +7,7 @@ import { LEVELS } from './progression/levels';
 import { canLayPhase, canHitCard } from './engine/rules';
 import CardView, { CardBack } from './components/Card';
 import Legend from './components/Legend';
+import Rules from './components/Rules';
 import { toggleSound, isSoundOn } from './audio/audio';
 import './App.css';
 
@@ -33,6 +34,7 @@ export default function App() {
   const [draggedCardId, setDraggedCardId] = useState<string | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const [showLegend, setShowLegend] = useState(false);
+  const [showRules, setShowRules] = useState(false);
   const handRef = useRef<HTMLDivElement>(null);
   const [handOverlap, setHandOverlap] = useState(0);
   const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard' | 'expert'>('easy');
@@ -76,6 +78,12 @@ export default function App() {
             onClick={() => setShowLegend(true)}
           >
             ?
+          </button>
+          <button
+            className="px-2 py-1 rounded bg-slate-700 text-xs ml-2"
+            onClick={() => setShowRules(true)}
+          >
+            Rules
           </button>
         </div>
         <h1 className="text-3xl font-bold">{t('app.title')}</h1>
@@ -142,7 +150,7 @@ export default function App() {
             className="text-xs text-slate-400 underline self-start"
             onClick={() => setQuickPlay((q) => !q)}
           >
-            {quickPlay ? 'Hide quick play' : 'Quick play (custom)'}
+            {quickPlay ? t('home.hideQuickPlay') : t('home.quickPlay')}
           </button>
 
           <div className="flex gap-2">
@@ -202,7 +210,7 @@ export default function App() {
                 className="px-4 py-3 rounded bg-slate-700 font-semibold"
                 onClick={() => startMatch({ humanName: name, difficulty, aiCount, targetPhases: 10 })}
               >
-                Start Custom Game
+                {t('home.customGame')}
               </button>
             </>
           )}
@@ -210,6 +218,7 @@ export default function App() {
         {gameWinner && <p className="text-green-400">Winner: {gameWinner}</p>}
       </div>
       {showLegend && <Legend onClose={() => setShowLegend(false)} />}
+      {showRules && <Rules onClose={() => setShowRules(false)} />}
     </>);
   }
 
@@ -301,9 +310,13 @@ export default function App() {
                       if (cardId) humanHit(cardId, p.id, gi);
                       setDraggedCardId(null);
                     }}
-                    className="min-w-[50px] h-8 rounded border border-dashed border-slate-500 flex items-center justify-center text-[10px] text-slate-300 px-1 hover:border-white/60 transition"
+                    className="flex items-center gap-0.5 rounded border border-dashed border-slate-500 p-0.5 hover:border-white/60 transition"
                   >
-                    {g.kind[0].toUpperCase()}×{g.cards.length}
+                    {g.cardObjs && g.cardObjs.length > 0 ? (
+                      g.cardObjs.map((c, ci) => <CardView key={ci} card={c} small />)
+                    ) : (
+                      <span className="text-[10px] text-slate-300 px-1">{g.kind[0].toUpperCase()}×{g.cards.length}</span>
+                    )}
                   </div>
                 ))}
               </div>
@@ -368,7 +381,7 @@ export default function App() {
             disabled={!canLay}
             onClick={() => { humanLayPhase(); setSelectedCard(null); }}
           >
-            Lay Phase
+            {t('game.layPhase')}
           </button>
           <button
             className="px-2 py-1 rounded bg-amber-600 text-xs disabled:opacity-50"
@@ -396,19 +409,25 @@ export default function App() {
               setSelectedCard(null);
             }}
           >
-            Hit
+            {t('game.hit')}
           </button>
           <button
             className="px-2 py-1 rounded bg-slate-600 text-xs"
             onClick={() => { reset(); }}
           >
-            Quit
+            {t('game.quit')}
           </button>
           <button
             className="px-2 py-1 rounded bg-slate-700 text-xs"
             onClick={() => setShowLegend(true)}
           >
             ?
+          </button>
+          <button
+            className="px-2 py-1 rounded bg-slate-700 text-xs"
+            onClick={() => setShowRules(true)}
+          >
+            Rules
           </button>
         </div>
         {selectedCard && !hitTarget && round.laid.human && (
@@ -420,6 +439,7 @@ export default function App() {
       </div>
     </div>
     {showLegend && <Legend onClose={() => setShowLegend(false)} />}
+    {showRules && <Rules onClose={() => setShowRules(false)} />}
     </>
   );
 }

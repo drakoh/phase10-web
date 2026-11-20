@@ -7,13 +7,17 @@
     "namePlaceholder": "Votre nom",
     "start": "Commencer",
     "opponents": "{{count}} adversaire",
-    "opponents_plural": "{{count}} adversaires"
+    "opponents_plural": "{{count}} adversaires",
+    "quickPlay": "Partie libre (personnalisée)",
+    "hideQuickPlay": "Masquer",
+    "customGame": "Partie personnalisée"
   },
   "game": {
     "draw": "Piocher",
     "discardPile": "Défausse",
     "layPhase": "Poser la phase",
     "discardSelected": "Défausser la sélection",
+    "hit": "Ajouter",
     "quit": "Quitter",
     "turn": "Tour : {{name}} ({{step}})",
     "phase": "Phase {{n}}",
