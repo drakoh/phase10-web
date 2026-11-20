@@ -4,8 +4,8 @@ import os
 OUT = "/Users/remicartier/Documents/work/phase10-web/public/cards"
 os.makedirs(OUT, exist_ok=True)
 
-W, H = 200, 280
-RADIUS = 18
+W, H = 400, 560
+RADIUS = 24
 
 COLORS = {
     "red": (225, 40, 40),
@@ -44,9 +44,9 @@ def draw_card(color, label, kind, sublabel=None):
 
     # fonts
     try:
-        font_big = ImageFont.truetype("/System/Library/Fonts/Helvetica.ttc", 96)
-        font_small = ImageFont.truetype("/System/Library/Fonts/Helvetica.ttc", 20)
-        font_sub = ImageFont.truetype("/System/Library/Fonts/Helvetica.ttc", 14)
+        font_big = ImageFont.truetype("/System/Library/Fonts/Helvetica.ttc", 208)
+        font_small = ImageFont.truetype("/System/Library/Fonts/Helvetica.ttc", 52)
+        font_sub = ImageFont.truetype("/System/Library/Fonts/Helvetica.ttc", 32)
     except Exception:
         font_big = ImageFont.load_default()
         font_small = ImageFont.load_default()
@@ -57,20 +57,19 @@ def draw_card(color, label, kind, sublabel=None):
         text_color = (40, 40, 40)
 
     # corner indices
-    draw.text((14, 10), str(label), font=font_small, fill=text_color)
-    # bottom-right rotated
-    draw.text((W-30, H-30), str(label), font=font_small, fill=text_color)
+    draw.text((24, 16), str(label), font=font_small, fill=text_color)
+    draw.text((W-60, H-68), str(label), font=font_small, fill=text_color)
 
     # center label
     bbox = draw.textbbox((0,0), str(label), font=font_big)
     tw = bbox[2]-bbox[0]
     th = bbox[3]-bbox[1]
-    draw.text(((W-tw)/2, (H-th)/2 - 10), str(label), font=font_big, fill=text_color)
+    draw.text(((W-tw)/2, (H-th)/2 - 20), str(label), font=font_big, fill=text_color)
 
     if sublabel:
         bbox2 = draw.textbbox((0,0), sublabel, font=font_sub)
         tw2 = bbox2[2]-bbox2[0]
-        draw.text(((W-tw2)/2, (H-th)/2 + th - 4), sublabel, font=font_sub, fill=text_color)
+        draw.text(((W-tw2)/2, (H-th)/2 + th - 8), sublabel, font=font_sub, fill=text_color)
 
     # rounded mask
     mask = rounded_mask((W, H))
@@ -102,8 +101,8 @@ m = rounded_mask((W,H))
 base = Image.new("RGB",(W,H),(25,20,60))
 bb = ImageDraw.Draw(base)
 # diagonal stripes
-for i in range(-H, W+H, 10):
-    bb.line([(i,0),(i+H,H)], fill=(60,50,110), width=6)
+for i in range(-H, W+H, 20):
+    bb.line([(i,0),(i+H,H)], fill=(60,50,110), width=12)
 # center glow
 for r in range(60,0,-1):
     bb.ellipse((W/2-r, H/2-r, W/2+r, H/2+r), fill=(40,30,90))
@@ -113,8 +112,8 @@ bd2.rounded_rectangle((1,1,W-2,H-2), radius=RADIUS, outline=(255,215,0,220), wid
 # inner border
 bd2.rounded_rectangle((10,10,W-11,H-11), radius=RADIUS-4, outline=(255,255,255,80), width=1)
 try:
-    font_logo = ImageFont.truetype("/System/Library/Fonts/Helvetica.ttc", 64)
-    font_sub = ImageFont.truetype("/System/Library/Fonts/Helvetica.ttc", 16)
+    font_logo = ImageFont.truetype("/System/Library/Fonts/Helvetica.ttc", 128)
+    font_sub = ImageFont.truetype("/System/Library/Fonts/Helvetica.ttc", 32)
 except Exception:
     font_logo = ImageFont.load_default()
     font_sub = ImageFont.load_default()
