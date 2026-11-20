@@ -13,6 +13,18 @@ export default function App() {
   const [aiCount, setAiCount] = useState(1);
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
 
+  if (gameWinner) {
+    return (
+      <div className="min-h-screen bg-slate-900 text-white flex flex-col items-center justify-center p-6 gap-4 relative">
+        <h1 className="text-3xl font-bold">{t('app.title')}</h1>
+        <p className="text-green-400 text-xl">Winner: {gameWinner}</p>
+        <button className="px-4 py-3 rounded bg-blue-600 font-semibold" onClick={() => reset()}>
+          {t('home.start')}
+        </button>
+      </div>
+    );
+  }
+
   if (!round) {
     return (
       <div className="min-h-screen bg-slate-900 text-white flex flex-col items-center justify-center p-6 gap-4 relative">
