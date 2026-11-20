@@ -347,7 +347,6 @@ export default function App() {
                 const [moved] = next.splice(from, 1);
                 next.splice(index, 0, moved);
                 reorderHand(next);
-                setDraggedCardId(card.id);
                 setDragOverIndex(index);
               }}
               onDragEnd={() => { setDraggedCardId(null); setDragOverIndex(null); }}
