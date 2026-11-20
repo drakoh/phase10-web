@@ -3,6 +3,7 @@ import type { RoundState, PlayerState } from '../engine/rules';
 import { createRound, applyAction, canLayPhase, scoreRound, advancePhases } from '../engine/rules';
 import { chooseAction } from '../engine/ai';
 import type { Difficulty } from '../engine/ai';
+import { useProgressStore } from './progressStore';
 
 interface MatchConfig {
   humanName: string;
@@ -92,10 +93,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const winner = r.winnerId!;
       const winnerPlayer = r.players.find((p) => p.id === winner)!;
       // phaseIndex before round: if was 9 and laid -> game win
-      const wonGame = winnerPlayer.phaseIndex === 9 && r.laid[winner] !== null; // phaseIndex already? advance not applied to r; r.players phaseIndex unchanged
-      // Actually phaseIndex in r.players is phase at start of round. winner with phaseIndex 9 laid phase 10 => game win.
-      if (wonGame || (config && /* target phases */ false)) {
+      const target = config?.targetPhases ?? 10;
+      const wonGame = !!r.laid[winner] && (winnerPlayer.phaseIndex + 1) >= target;
+      if (wonGame) {
         set({ gameWinner: winner });
+        if (winner === 'human') {
+          const lvl = useProgressStore.getState().currentLevel;
+          useProgressStore.getState().completeLevel(lvl, 3);
+        }
       }
       // prepare next round if no game winner
       if (!wonGame) {

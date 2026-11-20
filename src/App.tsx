@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useGameStore } from './state/gameStore';
+import { useProgressStore } from './state/progressStore';
+import { LEVELS } from './progression/levels';
 import { canLayPhase, canHitCard } from './engine/rules';
 import CardView, { CardBack } from './components/Card';
 import './App.css';
@@ -8,7 +10,10 @@ import './App.css';
 export default function App() {
   const { t, i18n } = useTranslation();
   const { round, lastScores, gameWinner, startMatch, humanDraw, humanLayPhase, humanHit, humanDiscard, reset } = useGameStore();
+  const progress = useProgressStore();
+  useEffect(() => { progress.load(); }, []);
   const [name, setName] = useState('You');
+  const [quickPlay, setQuickPlay] = useState(false);
   const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard' | 'expert'>('easy');
   const [aiCount, setAiCount] = useState(1);
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
@@ -49,31 +54,92 @@ export default function App() {
             onChange={(e) => setName(e.target.value)}
             placeholder={t('home.namePlaceholder')}
           />
-          <select
-            className="px-3 py-2 rounded bg-slate-800 border border-slate-700"
-            value={difficulty}
-            onChange={(e) => setDifficulty(e.target.value as any)}
-          >
-            <option value="easy">Easy</option>
-            <option value="medium">Medium</option>
-            <option value="hard">Hard</option>
-            <option value="expert">Expert</option>
-          </select>
-          <select
-            className="px-3 py-2 rounded bg-slate-800 border border-slate-700"
-            value={aiCount}
-            onChange={(e) => setAiCount(Number(e.target.value))}
-          >
-            <option value={1}>1 opponent</option>
-            <option value={2}>2 opponents</option>
-            <option value={3}>3 opponents</option>
-          </select>
+
+          {/* Journey */}
+          <div className="rounded-xl bg-slate-800 border border-slate-700 p-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="font-semibold">Journey</span>
+              <span className="text-xs text-slate-400">Lv {progress.playerLevel} · {progress.xp} XP</span>
+            </div>
+            <div className="text-sm text-slate-300 mb-2">
+              Level {progress.currentLevel + 1} / {LEVELS.length}
+              {' · '}
+              {LEVELS[progress.currentLevel].phases} phase(s)
+              {' · '}
+              {LEVELS[progress.currentLevel].difficulty}
+            </div>
+            <div className="flex gap-1 mb-3">
+              {Array.from({ length: LEVELS.length }).map((_, i) => (
+                <div
+                  key={i}
+                  className={`h-2 flex-1 rounded ${i < progress.unlocked ? (progress.stars[i] ? 'bg-yellow-400' : 'bg-slate-500') : 'bg-slate-700'}`}
+                />
+              ))}
+            </div>
+            <button
+              className="w-full px-4 py-3 rounded bg-blue-600 font-semibold disabled:opacity-50"
+              disabled={progress.currentLevel >= progress.unlocked - 1 && progress.currentLevel >= LEVELS.length - 1 ? false : false}
+              onClick={() => {
+                const cfg = LEVELS[progress.currentLevel];
+                startMatch({ humanName: name, difficulty: cfg.difficulty, aiCount: cfg.aiCount, targetPhases: cfg.phases });
+              }}
+            >
+              Play Level {progress.currentLevel + 1}
+            </button>
+            <div className="flex justify-between mt-2">
+              <button
+                className="text-xs text-slate-400 disabled:opacity-30"
+                disabled={progress.currentLevel <= 0}
+                onClick={() => progress.setCurrentLevel(progress.currentLevel - 1)}
+              >
+                ◀ Prev
+              </button>
+              <button
+                className="text-xs text-slate-400 disabled:opacity-30"
+                disabled={progress.currentLevel >= progress.unlocked - 1 || progress.currentLevel >= LEVELS.length - 1}
+                onClick={() => progress.setCurrentLevel(progress.currentLevel + 1)}
+              >
+                Next ▶
+              </button>
+            </div>
+          </div>
+
+          {/* Quick play toggle */}
           <button
-            className="px-4 py-3 rounded bg-blue-600 font-semibold"
-            onClick={() => startMatch({ humanName: name, difficulty, aiCount, targetPhases: 10 })}
+            className="text-xs text-slate-400 underline self-start"
+            onClick={() => setQuickPlay((q) => !q)}
           >
-            Start Game
+            {quickPlay ? 'Hide quick play' : 'Quick play (custom)'}
           </button>
+          {quickPlay && (
+            <>
+              <select
+                className="px-3 py-2 rounded bg-slate-800 border border-slate-700"
+                value={difficulty}
+                onChange={(e) => setDifficulty(e.target.value as any)}
+              >
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+                <option value="expert">Expert</option>
+              </select>
+              <select
+                className="px-3 py-2 rounded bg-slate-800 border border-slate-700"
+                value={aiCount}
+                onChange={(e) => setAiCount(Number(e.target.value))}
+              >
+                <option value={1}>1 opponent</option>
+                <option value={2}>2 opponents</option>
+                <option value={3}>3 opponents</option>
+              </select>
+              <button
+                className="px-4 py-3 rounded bg-slate-700 font-semibold"
+                onClick={() => startMatch({ humanName: name, difficulty, aiCount, targetPhases: 10 })}
+              >
+                Start Custom Game
+              </button>
+            </>
+          )}
         </div>
         {gameWinner && <p className="text-green-400">Winner: {gameWinner}</p>}
       </div>
