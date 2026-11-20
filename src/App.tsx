@@ -356,46 +356,105 @@ export default function App() {
 
       {/* hand */}
       <div className="p-2 bg-slate-800">
-        <div
-          ref={handRef}
-          className="flex pb-1 items-end justify-center min-h-[80px] px-2 pt-6"
-          onDragOver={(e) => e.preventDefault()}
-        >
-          {human.hand.map((card, index) => (
-            <div
-              key={card.id}
-              draggable
-              style={{ marginLeft: index === 0 ? 0 : -handOverlap }}
-              onDragStart={(e) => {
-                setDraggedCardId(card.id);
-                setDragOverIndex(null);
-                e.dataTransfer.setData('text/plain', card.id);
-                e.dataTransfer.effectAllowed = 'move';
-              }}
-              onDragOver={(e) => {
-                e.preventDefault();
-                if (!draggedCardId || draggedCardId === card.id) return;
-                if (dragOverIndex === index) return;
-                const from = human.hand.findIndex((c) => c.id === draggedCardId);
-                if (from === -1 || from === index) return;
-                const next = [...human.hand];
-                const [moved] = next.splice(from, 1);
-                next.splice(index, 0, moved);
-                reorderHand(next);
-                setDragOverIndex(index);
-              }}
-              onDragEnd={() => { setDraggedCardId(null); setDragOverIndex(null); }}
-              className="cursor-grab active:cursor-grabbing"
-            >
-              <CardView
-                card={card}
-                selected={selectedCard === card.id}
-                size={cardSize}
-                onClick={() => setSelectedCard(card.id === selectedCard ? null : card.id)}
-              />
+        {human.hand.length > 6 ? (
+          <div className="flex flex-col gap-1 px-2 pt-4">
+            <div className="flex items-end justify-center gap-0.5 opacity-60">
+              {human.hand.slice(0, Math.ceil(human.hand.length / 2)).map((card) => (
+                <CardView
+                  key={card.id}
+                  card={card}
+                  selected={selectedCard === card.id}
+                  size="sm"
+                  onClick={() => setSelectedCard(card.id === selectedCard ? null : card.id)}
+                />
+              ))}
             </div>
-          ))}
-        </div>
+            <div
+              ref={handRef}
+              className="flex items-end justify-center gap-1 min-h-[80px] pt-2"
+              onDragOver={(e) => e.preventDefault()}
+            >
+              {human.hand.slice(Math.ceil(human.hand.length / 2)).map((card, idx) => {
+                const index = Math.ceil(human.hand.length / 2) + idx;
+                return (
+                  <div
+                    key={card.id}
+                    draggable
+                    style={{ marginLeft: idx === 0 ? 0 : -handOverlap }}
+                    onDragStart={(e) => {
+                      setDraggedCardId(card.id);
+                      setDragOverIndex(null);
+                      e.dataTransfer.setData('text/plain', card.id);
+                      e.dataTransfer.effectAllowed = 'move';
+                    }}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      if (!draggedCardId || draggedCardId === card.id) return;
+                      if (dragOverIndex === index) return;
+                      const from = human.hand.findIndex((c) => c.id === draggedCardId);
+                      if (from === -1 || from === index) return;
+                      const next = [...human.hand];
+                      const [moved] = next.splice(from, 1);
+                      next.splice(index, 0, moved);
+                      reorderHand(next);
+                      setDragOverIndex(index);
+                    }}
+                    onDragEnd={() => { setDraggedCardId(null); setDragOverIndex(null); }}
+                    className="cursor-grab active:cursor-grabbing"
+                  >
+                    <CardView
+                      card={card}
+                      selected={selectedCard === card.id}
+                      size={cardSize}
+                      onClick={() => setSelectedCard(card.id === selectedCard ? null : card.id)}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ) : (
+          <div
+            ref={handRef}
+            className="flex pb-1 items-end justify-center min-h-[80px] px-2 pt-6"
+            onDragOver={(e) => e.preventDefault()}
+          >
+            {human.hand.map((card, index) => (
+              <div
+                key={card.id}
+                draggable
+                style={{ marginLeft: index === 0 ? 0 : -handOverlap }}
+                onDragStart={(e) => {
+                  setDraggedCardId(card.id);
+                  setDragOverIndex(null);
+                  e.dataTransfer.setData('text/plain', card.id);
+                  e.dataTransfer.effectAllowed = 'move';
+                }}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  if (!draggedCardId || draggedCardId === card.id) return;
+                  if (dragOverIndex === index) return;
+                  const from = human.hand.findIndex((c) => c.id === draggedCardId);
+                  if (from === -1 || from === index) return;
+                  const next = [...human.hand];
+                  const [moved] = next.splice(from, 1);
+                  next.splice(index, 0, moved);
+                  reorderHand(next);
+                  setDragOverIndex(index);
+                }}
+                onDragEnd={() => { setDraggedCardId(null); setDragOverIndex(null); }}
+                className="cursor-grab active:cursor-grabbing"
+              >
+                <CardView
+                  card={card}
+                  selected={selectedCard === card.id}
+                  size={cardSize}
+                  onClick={() => setSelectedCard(card.id === selectedCard ? null : card.id)}
+                />
+              </div>
+            ))}
+          </div>
+        )}
         <div className="flex gap-1 mt-1 flex-wrap">
           <button
             className="px-2 py-1 rounded bg-indigo-600 text-xs disabled:opacity-50"
@@ -494,6 +553,36 @@ export default function App() {
             onClick={() => setShowRules(true)}
           >
             Rules
+          </button>
+          <button
+            className="px-2 py-1 rounded bg-slate-700 text-xs disabled:opacity-50"
+            disabled={!selectedCard}
+            onClick={() => {
+              if (!selectedCard) return;
+              const idx = human.hand.findIndex((c) => c.id === selectedCard);
+              if (idx <= 0) return;
+              const next = [...human.hand];
+              const [moved] = next.splice(idx, 1);
+              next.splice(idx - 1, 0, moved);
+              reorderHand(next);
+            }}
+          >
+            ←
+          </button>
+          <button
+            className="px-2 py-1 rounded bg-slate-700 text-xs disabled:opacity-50"
+            disabled={!selectedCard}
+            onClick={() => {
+              if (!selectedCard) return;
+              const idx = human.hand.findIndex((c) => c.id === selectedCard);
+              if (idx < 0 || idx >= human.hand.length - 1) return;
+              const next = [...human.hand];
+              const [moved] = next.splice(idx, 1);
+              next.splice(idx + 1, 0, moved);
+              reorderHand(next);
+            }}
+          >
+            →
           </button>
           <button
             className="px-2 py-1 rounded bg-slate-700 text-xs"
