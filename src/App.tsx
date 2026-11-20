@@ -360,57 +360,40 @@ export default function App() {
           <div className="flex flex-col gap-1 px-2 pt-4">
             <div className="flex items-end justify-center gap-0.5 opacity-60">
               {human.hand.slice(0, Math.ceil(human.hand.length / 2)).map((card) => (
-                <div key={card.id} className="relative">
-                  <CardView
-                    card={card}
-                    selected={selectedCard === card.id}
-                    size="sm"
-                    onClick={() => setSelectedCard(card.id === selectedCard ? null : card.id)}
-                  />
-                  {selectedCard === card.id && (
-                    <>
-                      <button
-                        className="absolute left-0 top-0 h-full w-4 bg-blue-500/40 hover:bg-blue-500/70 rounded-l-xl"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          const idx = human.hand.findIndex((c) => c.id === card.id);
-                          if (idx < 0) return;
-                          const next = [...human.hand];
-                          const [moved] = next.splice(idx, 1);
-                          const newIdx = idx === 0 ? next.length : idx - 1;
-                          next.splice(newIdx, 0, moved);
-                          reorderHand(next);
-                        }}
-                      />
-                      <button
-                        className="absolute right-0 top-0 h-full w-4 bg-blue-500/40 hover:bg-blue-500/70 rounded-r-xl"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          const idx = human.hand.findIndex((c) => c.id === card.id);
-                          if (idx < 0) return;
-                          const next = [...human.hand];
-                          const [moved] = next.splice(idx, 1);
-                          const newIdx = idx >= next.length ? 0 : idx + 1;
-                          next.splice(newIdx, 0, moved);
-                          reorderHand(next);
-                        }}
-                      />
-                      <button
-                        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-4 bg-blue-500/40 hover:bg-blue-500/70 rounded-b-xl"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          const idx = human.hand.findIndex((c) => c.id === card.id);
-                          if (idx < 0) return;
-                          const half = Math.ceil(human.hand.length / 2);
-                          const next = [...human.hand];
-                          const [moved] = next.splice(idx, 1);
-                          next.splice(half, 0, moved);
-                          reorderHand(next);
-                        }}
-                      />
-                    </>
-                  )}
-                </div>
+                <CardView
+                  key={card.id}
+                  card={card}
+                  selected={selectedCard === card.id}
+                  size="sm"
+                  onClick={() => setSelectedCard(card.id === selectedCard ? null : card.id)}
+                  onMoveLeft={() => {
+                    const idx = human.hand.findIndex((c) => c.id === card.id);
+                    if (idx < 0) return;
+                    const next = [...human.hand];
+                    const [moved] = next.splice(idx, 1);
+                    const newIdx = idx === 0 ? next.length : idx - 1;
+                    next.splice(newIdx, 0, moved);
+                    reorderHand(next);
+                  }}
+                  onMoveRight={() => {
+                    const idx = human.hand.findIndex((c) => c.id === card.id);
+                    if (idx < 0) return;
+                    const next = [...human.hand];
+                    const [moved] = next.splice(idx, 1);
+                    const newIdx = idx >= next.length ? 0 : idx + 1;
+                    next.splice(newIdx, 0, moved);
+                    reorderHand(next);
+                  }}
+                  onMoveDown={() => {
+                    const idx = human.hand.findIndex((c) => c.id === card.id);
+                    if (idx < 0) return;
+                    const half = Math.ceil(human.hand.length / 2);
+                    const next = [...human.hand];
+                    const [moved] = next.splice(idx, 1);
+                    next.splice(half, 0, moved);
+                    reorderHand(next);
+                  }}
+                />
               ))}
             </div>
             <div
@@ -451,50 +434,34 @@ export default function App() {
                       selected={selectedCard === card.id}
                       size={cardSize}
                       onClick={() => setSelectedCard(card.id === selectedCard ? null : card.id)}
+                      onMoveLeft={() => {
+                        const i = human.hand.findIndex((c) => c.id === card.id);
+                        if (i < 0) return;
+                        const next = [...human.hand];
+                        const [moved] = next.splice(i, 1);
+                        const newIdx = i === 0 ? next.length : i - 1;
+                        next.splice(newIdx, 0, moved);
+                        reorderHand(next);
+                      }}
+                      onMoveRight={() => {
+                        const i = human.hand.findIndex((c) => c.id === card.id);
+                        if (i < 0) return;
+                        const next = [...human.hand];
+                        const [moved] = next.splice(i, 1);
+                        const newIdx = i >= next.length ? 0 : i + 1;
+                        next.splice(newIdx, 0, moved);
+                        reorderHand(next);
+                      }}
+                      onMoveUp={() => {
+                        const i = human.hand.findIndex((c) => c.id === card.id);
+                        if (i < 0) return;
+                        const half = Math.ceil(human.hand.length / 2);
+                        const next = [...human.hand];
+                        const [moved] = next.splice(i, 1);
+                        next.splice(half - 1, 0, moved);
+                        reorderHand(next);
+                      }}
                     />
-                    {selectedCard === card.id && (
-                      <>
-                        <button
-                          className="absolute left-0 top-0 h-full w-5 bg-blue-500/40 hover:bg-blue-500/70 rounded-l-2xl"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            const idx = human.hand.findIndex((c) => c.id === card.id);
-                            if (idx < 0) return;
-                            const next = [...human.hand];
-                            const [moved] = next.splice(idx, 1);
-                            const newIdx = idx === 0 ? next.length : idx - 1;
-                            next.splice(newIdx, 0, moved);
-                            reorderHand(next);
-                          }}
-                        />
-                        <button
-                          className="absolute right-0 top-0 h-full w-5 bg-blue-500/40 hover:bg-blue-500/70 rounded-r-2xl"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            const idx = human.hand.findIndex((c) => c.id === card.id);
-                            if (idx < 0) return;
-                            const next = [...human.hand];
-                            const [moved] = next.splice(idx, 1);
-                            const newIdx = idx >= next.length ? 0 : idx + 1;
-                            next.splice(newIdx, 0, moved);
-                            reorderHand(next);
-                          }}
-                        />
-                        <button
-                          className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-4 bg-blue-500/40 hover:bg-blue-500/70 rounded-t-2xl"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            const idx = human.hand.findIndex((c) => c.id === card.id);
-                            if (idx < 0) return;
-                            const half = Math.ceil(human.hand.length / 2);
-                            const next = [...human.hand];
-                            const [moved] = next.splice(idx, 1);
-                            next.splice(half - 1, 0, moved);
-                            reorderHand(next);
-                          }}
-                        />
-                      </>
-                    )}
                   </div>
                 );
               })}
@@ -540,43 +507,31 @@ export default function App() {
                     selected={selectedCard === card.id}
                     size={cardSize}
                     onClick={() => setSelectedCard(card.id === selectedCard ? null : card.id)}
+                    onMoveLeft={() => {
+                      const idx = human.hand.findIndex((c) => c.id === card.id);
+                      if (idx < 0) return;
+                      const next = [...human.hand];
+                      const [moved] = next.splice(idx, 1);
+                      const newIdx = idx === 0 ? next.length : idx - 1;
+                      next.splice(newIdx, 0, moved);
+                      reorderHand(next);
+                    }}
+                    onMoveRight={() => {
+                      const idx = human.hand.findIndex((c) => c.id === card.id);
+                      if (idx < 0) return;
+                      const next = [...human.hand];
+                      const [moved] = next.splice(idx, 1);
+                      const newIdx = idx >= next.length ? 0 : idx + 1;
+                      next.splice(newIdx, 0, moved);
+                      reorderHand(next);
+                    }}
                   />
                 </div>
-                {selectedCard === card.id && (
-                  <>
-                    <button
-                      className="absolute left-0 top-0 h-full w-5 bg-blue-500/40 hover:bg-blue-500/70 rounded-l-2xl"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        const idx = human.hand.findIndex((c) => c.id === card.id);
-                        if (idx < 0) return;
-                        const next = [...human.hand];
-                        const [moved] = next.splice(idx, 1);
-                        const newIdx = idx === 0 ? next.length : idx - 1;
-                        next.splice(newIdx, 0, moved);
-                        reorderHand(next);
-                      }}
-                    />
-                    <button
-                      className="absolute right-0 top-0 h-full w-5 bg-blue-500/40 hover:bg-blue-500/70 rounded-r-2xl"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        const idx = human.hand.findIndex((c) => c.id === card.id);
-                        if (idx < 0) return;
-                        const next = [...human.hand];
-                        const [moved] = next.splice(idx, 1);
-                        const newIdx = idx >= next.length ? 0 : idx + 1;
-                        next.splice(newIdx, 0, moved);
-                        reorderHand(next);
-                      }}
-                    />
-                  </>
-                )}
               </div>
             ))}
           </div>
         )}
-        <div className="flex gap-1 mt-1 flex-wrap">
+      <div className="flex gap-1 mt-1 flex-wrap">
           <button
             className="px-2 py-1 rounded bg-indigo-600 text-xs disabled:opacity-50"
             disabled={!canLay}
