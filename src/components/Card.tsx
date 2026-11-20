@@ -24,10 +24,10 @@ export function CardView({ card, selected, onClick, small, size: sizeProp }: { c
       animate={{ opacity: 1, scale: 1, y: selected ? -14 : 0, rotate: selected ? 2 : 0 }}
       transition={{ type: 'spring', stiffness: 380, damping: 26 }}
       onClick={onClick}
-      className={`relative ${size} rounded-2xl overflow-hidden shadow-2xl shrink-0 bg-slate-900 border-0 p-0 ${selected ? 'ring-4 ring-white/90 z-10' : ''}`}
+      className={`relative ${size} shadow-2xl shrink-0 bg-transparent border-0 p-0 ${selected ? 'ring-4 ring-white/90 z-10' : ''}`}
       style={{ transformOrigin: 'bottom center' }}
     >
-      <img src={cardSrc(card)} alt="" className="w-full h-full object-contain pointer-events-none select-none rounded-2xl" draggable={false} style={{ imageRendering: 'auto' }} />
+      <img src={cardSrc(card)} alt="" className="w-full h-full object-contain pointer-events-none select-none" draggable={false} style={{ imageRendering: 'auto' }} />
     </motion.button>
   );
 }
@@ -43,7 +43,7 @@ export function CardBack({ small, size: sizeProp }: { small?: boolean; size?: 's
     <img
       src="/phase10-web/cards/BACK.png"
       alt=""
-      className={`${size} rounded-2xl shadow-2xl object-contain shrink-0 bg-slate-900`}
+      className={`${size} shadow-2xl object-contain shrink-0 bg-transparent`}
       draggable={false}
       style={{ imageRendering: 'auto' }}
     />

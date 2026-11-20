@@ -264,7 +264,7 @@ export default function App() {
 
   return (
     <>
-    <div className="h-screen bg-slate-900 text-white flex flex-col max-w-6xl mx-auto w-full overflow-hidden">
+    <div className="relative h-screen bg-slate-900 text-white flex flex-col max-w-6xl mx-auto w-full overflow-hidden">
       {/* opponents */}
       <div className="flex gap-2 p-1 overflow-x-auto shrink-0">
         {opponents.map((o) => (
@@ -358,7 +358,7 @@ export default function App() {
       <div className="p-2 bg-slate-800">
         <div
           ref={handRef}
-          className="flex pb-1 items-end justify-center min-h-[110px] px-2 pt-6"
+          className="flex pb-1 items-end justify-center min-h-[80px] px-2 pt-6"
           onDragOver={(e) => e.preventDefault()}
         >
           {human.hand.map((card, index) => (
@@ -518,7 +518,9 @@ export default function App() {
           <div className="text-[10px] text-amber-400">Selected card doesn't fit any laid phase.</div>
         )}
         {hint && (
-          <div className="text-[10px] text-blue-300">{hint} <button className="underline" onClick={() => setHint(null)}>dismiss</button></div>
+          <div className="absolute top-2 left-1/2 -translate-x-1/2 z-50 text-[10px] text-blue-100 bg-slate-800/90 border border-slate-600 rounded px-2 py-1 max-w-[90%] truncate">
+            {hint} <button className="underline ml-1" onClick={() => setHint(null)}>×</button>
+          </div>
         )}
         <div className="text-[10px] text-slate-400 mt-0.5 truncate">
           {t('game.turn', { name: round.players[round.currentPlayerIndex].name, step: round.turnStep })} {isHumanTurn ? '' : '— AI'}
