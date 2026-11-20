@@ -560,10 +560,11 @@ export default function App() {
             onClick={() => {
               if (!selectedCard) return;
               const idx = human.hand.findIndex((c) => c.id === selectedCard);
-              if (idx <= 0) return;
+              if (idx < 0) return;
               const next = [...human.hand];
               const [moved] = next.splice(idx, 1);
-              next.splice(idx - 1, 0, moved);
+              const newIdx = idx === 0 ? next.length : idx - 1;
+              next.splice(newIdx, 0, moved);
               reorderHand(next);
             }}
           >
@@ -575,15 +576,65 @@ export default function App() {
             onClick={() => {
               if (!selectedCard) return;
               const idx = human.hand.findIndex((c) => c.id === selectedCard);
-              if (idx < 0 || idx >= human.hand.length - 1) return;
+              if (idx < 0) return;
               const next = [...human.hand];
               const [moved] = next.splice(idx, 1);
-              next.splice(idx + 1, 0, moved);
+              const newIdx = idx >= next.length ? 0 : idx + 1;
+              next.splice(newIdx, 0, moved);
               reorderHand(next);
             }}
           >
             →
           </button>
+          {human.hand.length > 6 && (
+            <>
+              <button
+                className="px-2 py-1 rounded bg-slate-700 text-xs disabled:opacity-50"
+                disabled={!selectedCard}
+                onClick={() => {
+                  if (!selectedCard) return;
+                  const idx = human.hand.findIndex((c) => c.id === selectedCard);
+                  if (idx < 0) return;
+                  const half = Math.ceil(human.hand.length / 2);
+                  // move selected to top row if in bottom, else to bottom row
+                  const next = [...human.hand];
+                  const [moved] = next.splice(idx, 1);
+                  if (idx >= half) {
+                    // bottom -> top: insert at end of top row
+                    next.splice(half - 1, 0, moved);
+                  } else {
+                    // top -> bottom: insert at start of bottom row
+                    next.splice(half, 0, moved);
+                  }
+                  reorderHand(next);
+                }}
+              >
+                ↑
+              </button>
+              <button
+                className="px-2 py-1 rounded bg-slate-700 text-xs disabled:opacity-50"
+                disabled={!selectedCard}
+                onClick={() => {
+                  if (!selectedCard) return;
+                  const idx = human.hand.findIndex((c) => c.id === selectedCard);
+                  if (idx < 0) return;
+                  const half = Math.ceil(human.hand.length / 2);
+                  const next = [...human.hand];
+                  const [moved] = next.splice(idx, 1);
+                  if (idx >= half) {
+                    // bottom -> top
+                    next.splice(half - 1, 0, moved);
+                  } else {
+                    // top -> bottom
+                    next.splice(half, 0, moved);
+                  }
+                  reorderHand(next);
+                }}
+              >
+                ↓
+              </button>
+            </>
+          )}
           <button
             className="px-2 py-1 rounded bg-slate-700 text-xs"
             onClick={async () => {
