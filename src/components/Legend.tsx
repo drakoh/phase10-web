@@ -40,8 +40,8 @@ export default function Legend({ onClose, currentPhase }: { onClose: () => void;
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-xl font-bold">Phase Legend</h2>
-            <button className="px-3 py-1 rounded bg-slate-700 text-sm" onClick={onClose}>Close</button>
+            <h2 className="text-xl font-bold">{t('common.legendTitle')}</h2>
+            <button className="px-3 py-1 rounded bg-slate-700 text-sm" onClick={onClose}>{t('common.close')}</button>
           </div>
           <div className="flex flex-col gap-4">
             {EXAMPLES.map((ex) => {

@@ -19,6 +19,13 @@
     "discardSelected": "Défausser la sélection",
     "hit": "Ajouter",
     "quit": "Quitter",
+    "winner": "Gagnant : {{name}}",
+    "hintDrawDiscard": "Indice : prenez la défausse si elle aide votre phase.",
+    "hintDrawPile": "Indice : piochez dans la pile.",
+    "hintLayPhase": "Indice : vous pouvez poser votre phase !",
+    "hintHit": "Indice : ajoutez {{card}} sur la phase de {{target}}.",
+    "hintDiscard": "Indice : défaussez {{card}} ({{color}}).",
+    "hintNoMove": "Indice : aucun coup évident.",
     "turn": "Tour : {{name}} ({{step}})",
     "phase": "Phase {{n}}",
     "cards": "{{count}} cartes",
@@ -27,6 +34,12 @@
     "yourPhaseLaid": "Votre phase est posée. Vous pouvez ajouter des cartes.",
     "roundOver": "Manche terminée",
     "pts": "pts"
+  },
+  "common": {
+    "phases": "Phases",
+    "rules": "Règles",
+    "close": "Fermer",
+    "legendTitle": "Légende des phases"
   },
   "difficulty": {
     "easy": "Facile",

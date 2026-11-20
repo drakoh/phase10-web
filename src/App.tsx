@@ -46,7 +46,7 @@ export default function App() {
     return (
       <div className="min-h-screen bg-slate-900 text-white flex flex-col items-center justify-center p-6 gap-4 relative">
         <h1 className="text-3xl font-bold">{t('app.title')}</h1>
-        <p className="text-green-400 text-xl">Winner: {gameWinner}</p>
+        <p className="text-green-400 text-xl">{t('game.winner', { name: gameWinner })}</p>
         <button className="px-4 py-3 rounded bg-blue-600 font-semibold" onClick={() => reset()}>
           {t('home.start')}
         </button>
@@ -78,7 +78,7 @@ export default function App() {
             className="px-2 py-1 rounded bg-slate-700 text-xs ml-2"
             onClick={() => setShowLegend(true)}
           >
-            Phases
+            {t('common.phases')}
           </button>
           <button
             className="px-2 py-1 rounded bg-slate-700 text-xs ml-2"
@@ -102,7 +102,7 @@ export default function App() {
             className="px-2 py-1 rounded bg-slate-700 text-xs ml-2"
             onClick={() => setShowRules(true)}
           >
-            Rules
+            {t('common.rules')}
           </button>
         </div>
         <h1 className="text-3xl font-bold">{t('app.title')}</h1>
@@ -501,7 +501,7 @@ export default function App() {
             className="px-2 py-1 rounded bg-slate-700 text-xs"
             onClick={() => setShowLegend(true)}
           >
-            Phases
+            {t('common.phases')}
           </button>
           <button
             className="px-2 py-1 rounded bg-amber-700 text-xs"
@@ -509,23 +509,23 @@ export default function App() {
               if (!round) return;
               if (round.turnStep === 'draw') {
                 const top = round.discardPile.length ? round.discardPile[round.discardPile.length - 1] : null;
-                setHint(top && top.kind !== 'skip' ? 'Hint: consider taking the discard pile card if it helps your phase.' : 'Hint: draw from the draw pile.');
+                setHint(top && top.kind !== 'skip' ? t('game.hintDrawDiscard') : t('game.hintDrawPile'));
                 return;
               }
               const layout = canLayPhase(round, 'human');
               if (layout && !round.laid.human) {
-                setHint('Hint: you can lay your phase now!');
+                setHint(t('game.hintLayPhase'));
                 return;
               }
               // find a hit
               if (round.laid.human) {
                 for (const c of human.hand) {
-                  for (const t of round.players) {
-                    const tl = round.laid[t.id];
+                  for (const p of round.players) {
+                    const tl = round.laid[p.id];
                     if (!tl) continue;
                     for (let gi = 0; gi < tl.groups.length; gi++) {
                       if (canHitCard(c, tl.groups[gi])) {
-                        setHint(`Hint: hit ${c.kind === 'number' ? c.value : c.kind} on ${t.id === 'human' ? 'your' : t.name + "'s"} phase.`);
+                        setHint(t('game.hintHit', { card: c.kind === 'number' ? c.value : c.kind, target: p.id === 'human' ? (i18n.language === 'fr' ? 'votre' : 'your') : p.name }));
                         return;
                       }
                     }
@@ -540,9 +540,9 @@ export default function App() {
                   const pb = b.kind === 'number' ? b.value : b.kind === 'skip' ? 15 : 25;
                   return pa - pb;
                 })[0];
-                setHint(`Hint: discard ${worst.kind === 'number' ? worst.value : worst.kind} (${worst.kind === 'number' ? worst.color : ''}).`);
+                setHint(t('game.hintDiscard', { card: worst.kind === 'number' ? worst.value : worst.kind, color: worst.kind === 'number' ? worst.color : '' }));
               } else {
-                setHint('Hint: no obvious move.');
+                setHint(t('game.hintNoMove'));
               }
             }}
           >
@@ -552,7 +552,7 @@ export default function App() {
             className="px-2 py-1 rounded bg-slate-700 text-xs"
             onClick={() => setShowRules(true)}
           >
-            Rules
+            {t('common.rules')}
           </button>
           <button
             className="px-2 py-1 rounded bg-slate-700 text-xs disabled:opacity-50"

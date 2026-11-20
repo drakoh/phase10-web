@@ -19,6 +19,13 @@
     "discardSelected": "Discard Selected",
     "hit": "Hit",
     "quit": "Quit",
+    "winner": "Winner: {{name}}",
+    "hintDrawDiscard": "Hint: consider taking the discard pile card if it helps your phase.",
+    "hintDrawPile": "Hint: draw from the draw pile.",
+    "hintLayPhase": "Hint: you can lay your phase now!",
+    "hintHit": "Hint: hit {{card}} on {{target}} phase.",
+    "hintDiscard": "Hint: discard {{card}} ({{color}}).",
+    "hintNoMove": "Hint: no obvious move.",
     "turn": "Turn: {{name}} ({{step}})",
     "phase": "Phase {{n}}",
     "cards": "{{count}} cards",
@@ -27,6 +34,12 @@
     "yourPhaseLaid": "Your phase is laid. Hits allowed.",
     "roundOver": "Round over",
     "pts": "pts"
+  },
+  "common": {
+    "phases": "Phases",
+    "rules": "Rules",
+    "close": "Close",
+    "legendTitle": "Phase Legend"
   },
   "difficulty": {
     "easy": "Easy",

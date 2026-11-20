@@ -22,7 +22,7 @@ const RULES_FR = [
 ];
 
 export default function Rules({ onClose }: { onClose: () => void }) {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const rules = i18n.language === 'fr' ? RULES_FR : RULES_EN;
   return (
     <AnimatePresence>
@@ -41,8 +41,8 @@ export default function Rules({ onClose }: { onClose: () => void }) {
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-xl font-bold">Rules</h2>
-            <button className="px-3 py-1 rounded bg-slate-700 text-sm" onClick={onClose}>Close</button>
+            <h2 className="text-xl font-bold">{t('common.rules')}</h2>
+            <button className="px-3 py-1 rounded bg-slate-700 text-sm" onClick={onClose}>{t('common.close')}</button>
           </div>
           <div className="flex flex-col gap-3">
             {rules.map((r) => (
