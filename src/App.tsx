@@ -19,6 +19,27 @@ export default function App() {
   const progress = useProgressStore();
   useEffect(() => { progress.load(); }, []);
   useEffect(() => {
+    if (!flyingCard || !rootRef.current) { setFlyPos(null); return; }
+    const root = rootRef.current.getBoundingClientRect();
+    const centerOf = (el: HTMLElement | null) => {
+      if (!el) return { x: root.width / 2, y: root.height / 2 };
+      const r = el.getBoundingClientRect();
+      return { x: r.left - root.left + r.width / 2, y: r.top - root.top + r.height / 2 };
+    };
+    const resolve = (key: string | { playerId: string; groupIndex: number }) => {
+      if (key === 'draw') return centerOf(drawPileRef.current);
+      if (key === 'discard') return centerOf(discardPileRef.current);
+      if (key === 'table') return centerOf(tableRef.current);
+      if (key === 'human') return centerOf(handRef.current);
+      if (typeof key === 'string') return centerOf(playerRefs.current[key] ?? null);
+      return centerOf(laidGroupRefs.current[`${key.playerId}-${key.groupIndex}`] ?? null);
+    };
+    const from = resolve(flyingCard.fromPlayerId as any);
+    const to = resolve(flyingCard.toTarget as any);
+    setFlyPos({ from, to });
+  }, [flyingCard, round]);
+
+  useEffect(() => {
     const el = handRef.current;
     if (!el || !round) return;
     const humanP = round.players.find((p) => p.id === 'human');
@@ -40,7 +61,14 @@ export default function App() {
   const [showRules, setShowRules] = useState(false);
   const [hint, setHint] = useState<string | null>(null);
   const handRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const drawPileRef = useRef<HTMLButtonElement>(null);
+  const discardPileRef = useRef<HTMLButtonElement>(null);
+  const tableRef = useRef<HTMLDivElement>(null);
+  const playerRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const laidGroupRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const [handOverlap, setHandOverlap] = useState(0);
+  const [flyPos, setFlyPos] = useState<{ from: { x: number; y: number }; to: { x: number; y: number } } | null>(null);
   const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard' | 'expert'>('easy');
   const [aiCount, setAiCount] = useState(1);
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
@@ -274,11 +302,11 @@ export default function App() {
 
   return (
     <>
-    <div className="relative h-screen bg-slate-900 text-white flex flex-col max-w-6xl mx-auto w-full overflow-hidden">
+    <div ref={rootRef} className="relative h-screen bg-slate-900 text-white flex flex-col max-w-6xl mx-auto w-full overflow-hidden">
       {/* opponents */}
       <div className="flex flex-wrap gap-2 p-1 shrink-0">
         {opponents.map((o) => (
-          <div key={o.id} className="bg-slate-800/60 rounded-lg p-1 min-w-[90px] flex items-center gap-1 text-xs">
+          <div key={o.id} ref={(el) => { playerRefs.current[o.id] = el; }} className="bg-slate-800/60 rounded-lg p-1 min-w-[90px] flex items-center gap-1 text-xs">
             <CardBack small />
             <div>
               <div className="font-semibold">{o.name}</div>
@@ -302,9 +330,10 @@ export default function App() {
       </div>
 
       {/* table */}
-      <div className="flex-1 flex flex-col items-center justify-center gap-2 p-2 min-h-0">
+      <div ref={tableRef} className="flex-1 flex flex-col items-center justify-center gap-2 p-2 min-h-0">
         <div className="flex gap-4 items-center">
           <button
+            ref={drawPileRef}
             className="flex flex-col items-center justify-center gap-0.5 disabled:opacity-50"
             disabled={!isHumanTurn || round.turnStep !== 'draw' || round.drawPile.length === 0}
             onClick={() => { humanDraw('draw'); setSelectedCard(null); }}
@@ -313,6 +342,7 @@ export default function App() {
             <span className="text-[10px] mt-0.5">{t('game.draw')} ({round.drawPile.length})</span>
           </button>
           <button
+            ref={discardPileRef}
             className="flex items-center justify-center disabled:opacity-50"
             disabled={!isHumanTurn || round.turnStep !== 'draw' || !topDiscard}
             onClick={() => { humanDraw('discard'); setSelectedCard(null); }}
@@ -338,6 +368,7 @@ export default function App() {
                 {laid.groups.map((g, gi) => (
                   <div
                     key={gi}
+                    ref={(el) => { laidGroupRefs.current[`${p.id}-${gi}`] = el; }}
                     onDragOver={(e) => e.preventDefault()}
                     onDrop={(e) => {
                       e.preventDefault();
@@ -720,8 +751,8 @@ export default function App() {
         <motion.img
           key={flyingCard.key}
           src={cardSrc(flyingCard.card)}
-          initial={{ top: flyingCard.from === 'top' ? '8%' : flyingCard.from === 'bottom' ? '82%' : '45%', left: '50%', x: '-50%', scale: 0.6, opacity: 0 }}
-          animate={{ top: flyingCard.to === 'top' ? '8%' : flyingCard.to === 'bottom' ? '82%' : '45%', left: '50%', x: '-50%', scale: 1, opacity: 1 }}
+          initial={flyPos ? { left: flyPos.from.x, top: flyPos.from.y, x: '-50%', y: '-50%', scale: 0.6, opacity: 0 } : { opacity: 0 }}
+          animate={flyPos ? { left: flyPos.to.x, top: flyPos.to.y, x: '-50%', y: '-50%', scale: 1, opacity: 1 } : { opacity: 0 }}
           exit={{ opacity: 0, scale: 0.5 }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
           className="absolute z-50 w-16 h-22 pointer-events-none drop-shadow-2xl"
