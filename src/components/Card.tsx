@@ -7,7 +7,7 @@ function cardSrc(card: any): string {
   return `${base}S.png`;
 }
 
-export function CardView({ card, selected, onClick, small, size: sizeProp, onMoveLeft, onMoveRight, onMoveUp, onMoveDown }: { card: any; selected?: boolean; onClick?: () => void; small?: boolean; size?: 'sm' | 'md' | 'lg'; onMoveLeft?: () => void; onMoveRight?: () => void; onMoveUp?: () => void; onMoveDown?: () => void }) {
+export function CardView({ card, selected, onClick, small, size: sizeProp, onMoveLeft, onMoveRight, onMoveUp, onMoveDown, layoutId }: { card: any; selected?: boolean; onClick?: () => void; small?: boolean; size?: 'sm' | 'md' | 'lg'; onMoveLeft?: () => void; onMoveRight?: () => void; onMoveUp?: () => void; onMoveDown?: () => void; layoutId?: string }) {
   const sizeKey = sizeProp ?? (small ? 'sm' : 'md');
   const size = sizeKey === 'sm'
     ? 'w-12 h-16 sm:w-14 sm:h-20'
@@ -18,6 +18,7 @@ export function CardView({ card, selected, onClick, small, size: sizeProp, onMov
   return (
     <motion.button
       layout
+      layoutId={layoutId}
       whileTap={{ scale: 0.92 }}
       whileHover={{ y: -8, scale: 1.05, zIndex: 50 }}
       initial={{ opacity: 0, scale: 0.7, y: 30 }}

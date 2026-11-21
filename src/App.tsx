@@ -307,7 +307,7 @@ export default function App() {
             disabled={!isHumanTurn || round.turnStep !== 'draw' || !topDiscard}
             onClick={() => { humanDraw('discard'); setSelectedCard(null); }}
           >
-            {topDiscard ? <CardView card={topDiscard} size={cardSize} /> : <span className="text-xs">{t('game.discardPile')}</span>}
+            {topDiscard ? <CardView card={topDiscard} size={cardSize} layoutId={`card-${topDiscard.id}`} /> : <span className="text-xs">{t('game.discardPile')}</span>}
           </button>
         </div>
 
@@ -338,7 +338,7 @@ export default function App() {
                     className="flex items-center gap-0.5 rounded border border-dashed border-slate-500 p-0.5 hover:border-white/60 transition"
                   >
                     {g.cardObjs && g.cardObjs.length > 0 ? (
-                      g.cardObjs.map((c, ci) => <CardView key={ci} card={c} size="sm" />)
+                      g.cardObjs.map((c, ci) => <CardView key={ci} card={c} size="sm" layoutId={`card-${c.id}`} />)
                     ) : (
                       <span className="text-[10px] text-slate-300 px-1">{g.kind[0].toUpperCase()}×{g.cards.length}</span>
                     )}
@@ -395,6 +395,7 @@ export default function App() {
                       card={card}
                       selected={selectedCard === card.id}
                       size="sm"
+                      layoutId={`card-${card.id}`}
                       onClick={() => setSelectedCard(card.id === selectedCard ? null : card.id)}
                       onMoveLeft={() => {
                         const i = human.hand.findIndex((c) => c.id === card.id);
@@ -465,6 +466,7 @@ export default function App() {
                       card={card}
                       selected={selectedCard === card.id}
                       size={cardSize}
+                      layoutId={`card-${card.id}`}
                       onClick={() => setSelectedCard(card.id === selectedCard ? null : card.id)}
                       onMoveLeft={() => {
                         const i = human.hand.findIndex((c) => c.id === card.id);
