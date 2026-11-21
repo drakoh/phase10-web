@@ -145,9 +145,12 @@ export function chooseAction(state: RoundState, playerId: string, difficulty: Di
   if (!state.laid[player.id]) {
     const layout = canLayPhase(state, playerId);
     if (layout) {
-      // construct action groups from layout
-      const groups = layout.groups.map((g) => ({ kind: g.kind as GroupKind, cardIds: [...g.cards] }));
-      return { type: 'layPhase', groups };
+      // easier difficulties sometimes hold off laying to be less aggressive
+      const layChance = difficulty === 'easy' ? 0.7 : difficulty === 'medium' ? 0.9 : 1;
+      if (rng() < layChance) {
+        const groups = layout.groups.map((g) => ({ kind: g.kind as GroupKind, cardIds: [...g.cards] }));
+        return { type: 'layPhase', groups };
+      }
     }
   }
 
