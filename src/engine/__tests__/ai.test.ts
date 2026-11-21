@@ -9,8 +9,8 @@ function rng(seed: number) {
 
 function playGame(seed: number): string {
   const players = [
-    { id: 'expert', name: 'X', isHuman: false, phaseIndex: 0, hand: [] },
-    { id: 'easy', name: 'E', isHuman: false, phaseIndex: 0, hand: [] },
+    { id: 'expert', name: 'X', avatar: '🙂', isHuman: false, phaseIndex: 0, hand: [] },
+    { id: 'easy', name: 'E', avatar: '👦', isHuman: false, phaseIndex: 0, hand: [] },
   ];
   const r0 = rng(seed);
   let round = createRound(players as any, 0, r0);

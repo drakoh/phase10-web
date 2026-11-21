@@ -306,11 +306,13 @@ export default function App() {
       {/* opponents */}
       <div className="flex flex-wrap gap-2 p-1 shrink-0">
         {opponents.map((o) => (
-          <div key={o.id} ref={(el) => { playerRefs.current[o.id] = el; }} className="bg-slate-800/60 rounded-lg p-1 min-w-[90px] flex items-center gap-1 text-xs">
+          <div key={o.id} ref={(el) => { playerRefs.current[o.id] = el; }} className="bg-slate-800/60 rounded-lg p-2 min-w-[110px] flex items-center gap-2 text-xs">
+            <div className="text-2xl">{o.avatar}</div>
             <CardBack small />
             <div>
-              <div className="font-semibold">{o.name}</div>
-              <div className="text-slate-300">{t('game.phase', { n: o.phaseIndex + 1 })} · {o.hand.length}c</div>
+              <div className="font-semibold text-sm">{o.name}</div>
+              <div className="text-slate-300">{t('game.phase', { n: o.phaseIndex + 1 })}</div>
+              <div className="text-slate-200 font-bold text-sm">{t('game.cards', { count: o.hand.length })}</div>
               {round.laid[o.id] && <div className="text-green-400">{t('game.laid')}</div>}
               {round.skipInFront[o.id] && <div className="text-amber-400">{t('game.skipped')}</div>}
             </div>

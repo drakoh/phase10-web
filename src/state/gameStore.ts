@@ -48,10 +48,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
   flyingCard: null,
 
   startMatch: (cfg) => {
+    const aiChars = [
+      { name: 'Luna', avatar: '👩' },
+      { name: 'Max', avatar: '👦' },
+      { name: 'Zoe', avatar: '👧' },
+      { name: 'Leo', avatar: '🧑' },
+    ];
     const players: PlayerState[] = [];
-    players.push({ id: 'human', name: cfg.humanName || 'You', isHuman: true, phaseIndex: 0, hand: [] });
+    players.push({ id: 'human', name: cfg.humanName || 'You', avatar: '🙂', isHuman: true, phaseIndex: 0, hand: [] });
     for (let i = 0; i < cfg.aiCount; i++) {
-      players.push({ id: `ai${i}`, name: `AI ${i + 1}`, isHuman: false, phaseIndex: 0, hand: [] });
+      const c = aiChars[i % aiChars.length];
+      players.push({ id: `ai${i}`, name: c.name, avatar: c.avatar, isHuman: false, phaseIndex: 0, hand: [] });
     }
     const rng = makeRng();
     const round = createRound(players, 0, rng);

@@ -22,6 +22,7 @@ export class IllegalMoveError extends Error {}
 export interface PlayerState {
   id: string;
   name: string;
+  avatar: string;
   isHuman: boolean;
   phaseIndex: number; // 0..9, phase currently being attempted
   hand: Card[];

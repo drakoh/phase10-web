@@ -8,8 +8,8 @@ describe('sim', () => {
     const N = 200;
     for (let i = 0; i < N; i++) {
       const players = [
-        { id: 'human', name: 'H', isHuman: true, phaseIndex: 0, hand: [] },
-        { id: 'ai', name: 'A', isHuman: false, phaseIndex: 0, hand: [] },
+        { id: 'human', name: 'H', avatar: '🙂', isHuman: true, phaseIndex: 0, hand: [] },
+        { id: 'ai', name: 'A', avatar: '👦', isHuman: false, phaseIndex: 0, hand: [] },
       ];
       let s = 12345 + i;
       const rng = () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 0xffffffff; };
