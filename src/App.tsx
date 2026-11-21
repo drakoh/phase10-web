@@ -359,42 +359,69 @@ export default function App() {
         {human.hand.length > 6 ? (
           <div className="flex flex-col gap-1 px-2 pt-4">
             <div className="flex items-end justify-center gap-0.5 opacity-60">
-              {human.hand.slice(0, Math.ceil(human.hand.length / 2)).map((card) => (
-                <CardView
-                  key={card.id}
-                  card={card}
-                  selected={selectedCard === card.id}
-                  size="sm"
-                  onClick={() => setSelectedCard(card.id === selectedCard ? null : card.id)}
-                  onMoveLeft={() => {
-                    const idx = human.hand.findIndex((c) => c.id === card.id);
-                    if (idx < 0) return;
-                    const next = [...human.hand];
-                    const [moved] = next.splice(idx, 1);
-                    const newIdx = idx === 0 ? next.length : idx - 1;
-                    next.splice(newIdx, 0, moved);
-                    reorderHand(next);
-                  }}
-                  onMoveRight={() => {
-                    const idx = human.hand.findIndex((c) => c.id === card.id);
-                    if (idx < 0) return;
-                    const next = [...human.hand];
-                    const [moved] = next.splice(idx, 1);
-                    const newIdx = idx >= next.length ? 0 : idx + 1;
-                    next.splice(newIdx, 0, moved);
-                    reorderHand(next);
-                  }}
-                  onMoveDown={() => {
-                    const idx = human.hand.findIndex((c) => c.id === card.id);
-                    if (idx < 0) return;
-                    const half = Math.ceil(human.hand.length / 2);
-                    const next = [...human.hand];
-                    const [moved] = next.splice(idx, 1);
-                    next.splice(half, 0, moved);
-                    reorderHand(next);
-                  }}
-                />
-              ))}
+              {human.hand.slice(0, Math.ceil(human.hand.length / 2)).map((card, idx) => {
+                const index = idx;
+                return (
+                  <div
+                    key={card.id}
+                    draggable
+                    onDragStart={(e) => {
+                      setDraggedCardId(card.id);
+                      setDragOverIndex(null);
+                      e.dataTransfer.setData('text/plain', card.id);
+                      e.dataTransfer.effectAllowed = 'move';
+                    }}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      if (!draggedCardId || draggedCardId === card.id) return;
+                      if (dragOverIndex === index) return;
+                      const from = human.hand.findIndex((c) => c.id === draggedCardId);
+                      if (from === -1 || from === index) return;
+                      const next = [...human.hand];
+                      const [moved] = next.splice(from, 1);
+                      next.splice(index, 0, moved);
+                      reorderHand(next);
+                      setDragOverIndex(index);
+                    }}
+                    onDragEnd={() => { setDraggedCardId(null); setDragOverIndex(null); }}
+                    className="relative cursor-grab active:cursor-grabbing"
+                  >
+                    <CardView
+                      card={card}
+                      selected={selectedCard === card.id}
+                      size="sm"
+                      onClick={() => setSelectedCard(card.id === selectedCard ? null : card.id)}
+                      onMoveLeft={() => {
+                        const i = human.hand.findIndex((c) => c.id === card.id);
+                        if (i < 0) return;
+                        const next = [...human.hand];
+                        const [moved] = next.splice(i, 1);
+                        const newIdx = i === 0 ? next.length : i - 1;
+                        next.splice(newIdx, 0, moved);
+                        reorderHand(next);
+                      }}
+                      onMoveRight={() => {
+                        const i = human.hand.findIndex((c) => c.id === card.id);
+                        if (i < 0) return;
+                        const next = [...human.hand];
+                        const [moved] = next.splice(i, 1);
+                        const newIdx = i >= next.length ? 0 : i + 1;
+                        next.splice(newIdx, 0, moved);
+                        reorderHand(next);
+                      }}
+                      onMoveDown={() => {
+                        const i = human.hand.findIndex((c) => c.id === card.id);
+                        if (i < 0) return;
+                        const half = Math.ceil(human.hand.length / 2);
+                        const next = [...human.hand];
+                        const [moved] = next.splice(i, 1);
+                        next.splice(half, 0, moved);
+                        reorderHand(next);
+                      }}
+                    />
+                  </div>
+                );
+              })}
             </div>
             <div
               ref={handRef}
