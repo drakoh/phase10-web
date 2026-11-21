@@ -266,7 +266,7 @@ export default function App() {
     <>
     <div className="relative h-screen bg-slate-900 text-white flex flex-col max-w-6xl mx-auto w-full overflow-hidden">
       {/* opponents */}
-      <div className="flex gap-2 p-1 overflow-x-auto shrink-0">
+      <div className="flex flex-wrap gap-2 p-1 shrink-0">
         {opponents.map((o) => (
           <div key={o.id} className="bg-slate-800/60 rounded-lg p-1 min-w-[90px] flex items-center gap-1 text-xs">
             <CardBack small />
@@ -313,7 +313,7 @@ export default function App() {
         )}
 
         {/* Laid phases / drop targets (compact) */}
-        <div className="w-full flex flex-wrap gap-1 justify-center max-h-20 overflow-y-auto">
+        <div className="w-full flex flex-wrap gap-1 justify-center">
           {round.players.map((p) => {
             const laid = round.laid[p.id];
             if (!laid) return null;
