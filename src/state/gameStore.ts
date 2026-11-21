@@ -123,22 +123,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
     get().runAiTurns();
   },
 
-  runAiTurns: () => {
+  runAiTurns: async () => {
     const { round, config } = get();
     if (!round || round.status !== 'playing') return;
     const difficulty = config?.difficulty ?? 'easy';
     let current = round;
     const rng = makeRng();
-    // loop while current player is AI
+    const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
     let guard = 0;
     while (guard < 50 && current.status === 'playing') {
       const cp = current.players[current.currentPlayerIndex];
       if (cp.isHuman) break;
-      // run one full turn for AI
       // draw
       if (current.turnStep === 'draw') {
         const action = chooseAction(current, cp.id, difficulty, rng);
         current = applyAction(current, action);
+        set({ round: current });
+        await delay(400);
       }
       // play (lay/hits) until discard
       let playGuard = 0;
@@ -147,6 +148,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (cp2.isHuman) break;
         const action = chooseAction(current, cp2.id, difficulty, rng);
         current = applyAction(current, action);
+        set({ round: current });
+        await delay(action.type === 'layPhase' ? 700 : action.type === 'hit' ? 300 : 400);
         playGuard++;
         if (action.type === 'discard') break;
       }
