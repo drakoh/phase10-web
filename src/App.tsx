@@ -13,7 +13,7 @@ import './App.css';
 
 export default function App() {
   const { t, i18n } = useTranslation();
-  const { round, lastScores, gameWinner, startMatch, humanDraw, humanLayPhase, humanHit, humanDiscard, reorderHand, reset } = useGameStore();
+  const { round, lastScores, gameWinner, actionLog, startMatch, humanDraw, humanLayPhase, humanHit, humanDiscard, reorderHand, reset } = useGameStore();
   const progress = useProgressStore();
   useEffect(() => { progress.load(); }, []);
   useEffect(() => {
@@ -284,6 +284,11 @@ export default function App() {
       <div className="mx-2 mt-1 rounded-lg bg-slate-800/80 border border-slate-700 px-3 py-1 text-center text-sm">
         <span className="text-slate-400">{t('game.phase', { n: human.phaseIndex + 1 })}:</span>{' '}
         <span className="font-semibold text-white">{t(`phases.${human.phaseIndex}`)}</span>
+      </div>
+
+      {/* action log */}
+      <div className="mx-2 max-h-16 overflow-y-auto text-[10px] text-slate-300 bg-slate-800/40 rounded px-2 py-1">
+        {actionLog.length === 0 ? '—' : actionLog.map((m, i) => <div key={i}>{m}</div>)}
       </div>
 
       {/* table */}
