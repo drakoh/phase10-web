@@ -176,6 +176,8 @@ export function legalActions(state: RoundState, playerId: string): Action[] {
 
   // discards
   for (const card of player.hand) {
+    // cannot discard last card without having laid a phase (would leave 0 cards but not go out)
+    if (player.hand.length === 1 && !state.laid[player.id]) continue;
     if (card.kind === 'skip') {
       for (const target of state.players) {
         if (target.id === player.id) continue;
@@ -285,6 +287,11 @@ export function applyAction(state: RoundState, action: Action): RoundState {
     if (state.turnStep !== 'play') throw new IllegalMoveError('not play step');
     const card = player.hand.find((c) => c.id === action.cardId);
     if (!card) throw new IllegalMoveError('card not in hand');
+
+    // cannot discard last card without having laid a phase
+    if (player.hand.length === 1 && !state.laid[player.id]) {
+      throw new IllegalMoveError('cannot discard last card without laying phase');
+    }
 
     const isSkipCard = card.kind === 'skip';
     let newSkipInFront = { ...state.skipInFront };
