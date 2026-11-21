@@ -5,7 +5,8 @@ import { useProgressStore } from './state/progressStore';
 import { exportProgressJson, importProgressJson } from './persistence/db';
 import { LEVELS } from './progression/levels';
 import { canLayPhase, canHitCard } from './engine/rules';
-import CardView, { CardBack } from './components/Card';
+import { motion, AnimatePresence } from 'framer-motion';
+import CardView, { CardBack, cardSrc } from './components/Card';
 import Legend from './components/Legend';
 import Rules from './components/Rules';
 import { toggleSound, isSoundOn } from './audio/audio';
@@ -13,7 +14,7 @@ import './App.css';
 
 export default function App() {
   const { t, i18n } = useTranslation();
-  const { round, lastScores, gameWinner, actionLog, startMatch, humanDraw, humanLayPhase, humanHit, humanDiscard, reorderHand, reset } = useGameStore();
+  const { round, lastScores, gameWinner, actionLog, flyingCard, startMatch, humanDraw, humanLayPhase, humanHit, humanDiscard, reorderHand, reset } = useGameStore();
   const progress = useProgressStore();
   useEffect(() => { progress.load(); }, []);
   useEffect(() => {
@@ -699,6 +700,20 @@ export default function App() {
     </div>
     {showLegend && <Legend onClose={() => setShowLegend(false)} currentPhase={human.phaseIndex} />}
     {showRules && <Rules onClose={() => setShowRules(false)} />}
+    <AnimatePresence>
+      {flyingCard && flyingCard.card && (
+        <motion.img
+          key={flyingCard.key}
+          src={cardSrc(flyingCard.card)}
+          initial={{ top: flyingCard.from === 'top' ? '5%' : '85%', left: '50%', x: '-50%', scale: 0.6, opacity: 0 }}
+          animate={{ top: '45%', left: '50%', x: '-50%', scale: 1, opacity: 1 }}
+          exit={{ opacity: 0, scale: 0.5 }}
+          transition={{ duration: 0.45, ease: 'easeOut' }}
+          className="absolute z-50 w-16 h-22 pointer-events-none drop-shadow-2xl"
+          style={{ imageRendering: 'auto' }}
+        />
+      )}
+    </AnimatePresence>
     </>
   );
 }

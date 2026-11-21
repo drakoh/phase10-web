@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 
-function cardSrc(card: any): string {
+export function cardSrc(card: any): string {
   const base = '/phase10-web/cards/';
   if (card.kind === 'number') return `${base}${card.value}${card.color[0].toUpperCase()}.png`;
   if (card.kind === 'wild') return `${base}W${card.color[0].toUpperCase()}.png`;
