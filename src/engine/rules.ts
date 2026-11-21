@@ -259,7 +259,9 @@ export function applyAction(state: RoundState, action: Action): RoundState {
     const newHand = player.hand.filter((c) => !laidCards.has(c.id));
     const newLaid = { ...state.laid, [player.id]: instance2 };
     const newPlayers = replacePlayer(state.players, player.id, { hand: newHand });
-    return { ...state, players: newPlayers, laid: newLaid };
+    let newState: RoundState = { ...state, players: newPlayers, laid: newLaid };
+    newState = finishIfGoOut(newState, player.id);
+    return newState;
   }
 
   if (action.type === 'hit') {
