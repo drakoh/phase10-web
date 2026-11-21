@@ -720,10 +720,10 @@ export default function App() {
         <motion.img
           key={flyingCard.key}
           src={cardSrc(flyingCard.card)}
-          initial={{ top: flyingCard.from === 'top' ? '5%' : '85%', left: '50%', x: '-50%', scale: 0.6, opacity: 0 }}
-          animate={{ top: '45%', left: '50%', x: '-50%', scale: 1, opacity: 1 }}
+          initial={{ top: flyingCard.from === 'top' ? '8%' : flyingCard.from === 'bottom' ? '82%' : '45%', left: '50%', x: '-50%', scale: 0.6, opacity: 0 }}
+          animate={{ top: flyingCard.to === 'top' ? '8%' : flyingCard.to === 'bottom' ? '82%' : '45%', left: '50%', x: '-50%', scale: 1, opacity: 1 }}
           exit={{ opacity: 0, scale: 0.5 }}
-          transition={{ duration: 0.45, ease: 'easeOut' }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
           className="absolute z-50 w-16 h-22 pointer-events-none drop-shadow-2xl"
           style={{ imageRendering: 'auto' }}
         />

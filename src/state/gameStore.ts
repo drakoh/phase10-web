@@ -20,7 +20,7 @@ interface GameStore {
   lastScores: Record<string, number> | null;
   gameWinner: string | null;
   actionLog: string[];
-  flyingCard: { card: any; from: 'top' | 'bottom'; key: number } | null;
+  flyingCard: { card: any; from: 'top' | 'bottom' | 'center'; to: 'top' | 'bottom' | 'center'; key: number } | null;
   startMatch: (cfg: MatchConfig) => void;
   humanDraw: (source: 'draw' | 'discard') => void;
   humanLayPhase: () => void;
@@ -63,8 +63,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
   humanDraw: (source) => {
     const { round } = get();
     if (!round) return;
+    const drawnCard = source === 'draw' ? round.drawPile[0] : (round.discardPile.length ? round.discardPile[round.discardPile.length - 1] : null);
     const r = applyAction(round, { type: 'draw', source });
-    set({ round: r, actionLog: [...get().actionLog, i18n.t('log.youDraw', { source: source === 'draw' ? (i18n.language === 'fr' ? 'la pile' : 'the draw pile') : (i18n.language === 'fr' ? 'la défausse' : 'the discard pile') })].slice(-8) });
+    set({ round: r, actionLog: [...get().actionLog, i18n.t('log.youDraw', { source: source === 'draw' ? (i18n.language === 'fr' ? 'la pile' : 'the draw pile') : (i18n.language === 'fr' ? 'la défausse' : 'the discard pile') })].slice(-8), flyingCard: drawnCard ? { card: drawnCard, from: 'center', to: 'bottom', key: Date.now() } : null });
+    setTimeout(() => set({ flyingCard: null }), 600);
     playSfx('draw');
     get().runAiTurns();
   },
@@ -75,7 +77,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const layout = canLayPhase(round, 'human');
     if (!layout) return;
     const r = applyAction(round, { type: 'layPhase', groups: layout.groups.map((g) => ({ kind: g.kind, cardIds: [...g.cards] })) });
-    set({ round: r, actionLog: [...get().actionLog, i18n.t('log.youLay')].slice(-8), flyingCard: { card: layout.groups[0]?.cardObjs?.[0] ?? layout.groups[0]?.cards[0], from: 'bottom', key: Date.now() } });
+    set({ round: r, actionLog: [...get().actionLog, i18n.t('log.youLay')].slice(-8), flyingCard: { card: layout.groups[0]?.cardObjs?.[0] ?? layout.groups[0]?.cards[0], from: 'bottom', to: 'center', key: Date.now() } });
     setTimeout(() => set({ flyingCard: null }), 800);
     playSfx('lay');
     get().runAiTurns();
@@ -86,7 +88,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!round) return;
     const r = applyAction(round, { type: 'hit', cardId, targetPlayerId, groupIndex });
     const hitCard = round.players.find((p) => p.id === 'human')?.hand.find((c) => c.id === cardId);
-    set({ round: r, actionLog: [...get().actionLog, i18n.t('log.youHit', { target: targetPlayerId })].slice(-8), flyingCard: { card: hitCard, from: 'bottom', key: Date.now() } });
+    set({ round: r, actionLog: [...get().actionLog, i18n.t('log.youHit', { target: targetPlayerId })].slice(-8), flyingCard: { card: hitCard, from: 'bottom', to: 'center', key: Date.now() } });
     setTimeout(() => set({ flyingCard: null }), 600);
     playSfx('hit');
     get().runAiTurns();
@@ -98,7 +100,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const r = applyAction(round, { type: 'discard', cardId, skipTargetPlayerId });
     const discarded = round.players.find((p) => p.id === 'human')?.hand.find((c) => c.id === cardId);
     playSfx(discarded?.kind === 'skip' ? 'skip' : 'discard');
-    set({ round: r, actionLog: [...get().actionLog, i18n.t('log.youDiscard', { skip: discarded?.kind === 'skip' ? (i18n.language === 'fr' ? ' un Passe' : ' a Skip') : '' })].slice(-8), flyingCard: { card: discarded, from: 'bottom', key: Date.now() } });
+    set({ round: r, actionLog: [...get().actionLog, i18n.t('log.youDiscard', { skip: discarded?.kind === 'skip' ? (i18n.language === 'fr' ? ' un Passe' : ' a Skip') : '' })].slice(-8), flyingCard: { card: discarded, from: 'bottom', to: 'center', key: Date.now() } });
     setTimeout(() => set({ flyingCard: null }), 600);
     // check round over
     if (r.status === 'finished') {
@@ -147,8 +149,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // draw
       if (current.turnStep === 'draw') {
         const action = chooseAction(current, cp.id, difficulty, rng);
+        const src = (action as { source?: 'draw' | 'discard' }).source ?? 'draw';
+        const drawnCard = src === 'draw' ? current.drawPile[0] : (current.discardPile.length ? current.discardPile[current.discardPile.length - 1] : null);
         current = applyAction(current, action);
-        set({ round: current, actionLog: [...get().actionLog, i18n.t('log.aiDraw', { name: cp.name })].slice(-8) });
+        set({ round: current, actionLog: [...get().actionLog, i18n.t('log.aiDraw', { name: cp.name })].slice(-8), flyingCard: drawnCard ? { card: drawnCard, from: 'center', to: 'top', key: Date.now() } : get().flyingCard });
+        if (drawnCard) setTimeout(() => set({ flyingCard: null }), 600);
         await delay(400);
       }
       // play (lay/hits) until discard
@@ -167,7 +172,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const msg = action.type === 'layPhase' ? i18n.t('log.aiLay', { name: cp2.name }) :
           action.type === 'hit' ? i18n.t('log.aiHit', { name: cp2.name }) :
           action.type === 'discard' ? i18n.t('log.aiDiscard', { name: cp2.name }) : `${cp2.name} played`;
-        set({ round: current, actionLog: [...get().actionLog, msg].slice(-8), flyingCard: actionCard ? { card: actionCard, from: 'top', key: Date.now() } : get().flyingCard });
+        set({ round: current, actionLog: [...get().actionLog, msg].slice(-8), flyingCard: actionCard ? { card: actionCard, from: 'top', to: 'center', key: Date.now() } : get().flyingCard });
         if (actionCard) setTimeout(() => set({ flyingCard: null }), action.type === 'layPhase' ? 700 : 500);
         await delay(action.type === 'layPhase' ? 700 : action.type === 'hit' ? 300 : 400);
         playGuard++;
