@@ -187,6 +187,30 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       guard++;
     }
+    // handle round over (AI win or otherwise)
+    if (current.status === 'finished') {
+      const scores = scoreRound(current);
+      const winner = current.winnerId!;
+      const winnerPlayer = current.players.find((p) => p.id === winner)!;
+      const target = get().config?.targetPhases ?? 10;
+      const wonGame = !!current.laid[winner] && (winnerPlayer.phaseIndex + 1) >= target;
+      if (wonGame) {
+        set({ round: current, lastScores: scores, gameWinner: winner, actionLog: [...get().actionLog, `${winner} wins the game!`].slice(-8) });
+        playSfx(winner === 'human' ? 'win' : 'lose');
+        if (winner === 'human') {
+          const lvl = useProgressStore.getState().currentLevel;
+          useProgressStore.getState().completeLevel(lvl, 3);
+        }
+        return;
+      }
+      const advanced = advancePhases(current);
+      const rng = makeRng();
+      const nextRound = createRound(advanced, (current.dealerIndex + 1) % current.players.length, rng);
+      set({ round: nextRound, lastScores: scores, actionLog: [...get().actionLog, `${winner} wins the round`].slice(-8) });
+      // continue if next player is AI
+      get().runAiTurns();
+      return;
+    }
     set({ round: current });
   },
 
