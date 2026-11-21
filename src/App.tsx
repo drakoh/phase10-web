@@ -46,48 +46,30 @@ export default function App() {
     positionsRef.current = next;
   });
 
-  useEffect(() => {
-    if (!flyingCard || !rootRef.current) { setFlyPos(null); return; }
+  const resolveFlyPos = (key: any) => {
+    if (!rootRef.current) return { x: 0, y: 0 };
     const root = rootRef.current.getBoundingClientRect();
     const centerOf = (el: HTMLElement | null) => {
-      if (!el) return { x: root.width / 2, y: root.height / 2 };
+      if (!el) return null;
       const r = el.getBoundingClientRect();
       return { x: r.left - root.left + r.width / 2, y: r.top - root.top + r.height / 2 };
     };
-    const fallback = (key: string | { playerId: string; groupIndex: number }) => {
-      if (key === 'draw') return { x: root.width * 0.35, y: root.height * 0.45 };
-      if (key === 'discard') return { x: root.width * 0.65, y: root.height * 0.45 };
-      if (key === 'table') return { x: root.width * 0.5, y: root.height * 0.45 };
-      if (key === 'human') return { x: root.width * 0.5, y: root.height * 0.85 };
-      if (typeof key === 'string') return { x: root.width * 0.5, y: root.height * 0.08 };
-      return { x: root.width * 0.5, y: root.height * 0.45 };
-    };
-    const resolve = (key: string | { playerId: string; groupIndex: number }) => {
-      const k = typeof key === 'string' ? key : `${key.playerId}-${key.groupIndex}`;
-      if (positionsRef.current[k]) return positionsRef.current[k];
-      if (key === 'draw') {
-        const c = centerOf(drawPileRef.current); if (c) return c;
-      }
-      if (key === 'discard') {
-        const c = centerOf(discardPileRef.current); if (c) return c;
-      }
-      if (key === 'table') {
-        const c = centerOf(tableRef.current); if (c) return c;
-      }
-      if (key === 'human') {
-        const c = centerOf(handRef.current); if (c) return c;
-      }
-      if (typeof key === 'string') {
-        const c = centerOf(playerRefs.current[key] ?? null); if (c) return c;
-      } else {
-        const c = centerOf(laidGroupRefs.current[`${key.playerId}-${key.groupIndex}`] ?? null); if (c) return c;
-      }
-      return fallback(key);
-    };
-    const from = resolve(flyingCard.fromPlayerId as any);
-    const to = resolve(flyingCard.toTarget as any);
-    setFlyPos({ from, to });
-  }, [flyingCard, round]);
+    let c: { x: number; y: number } | null = null;
+    if (key === 'draw') c = centerOf(drawPileRef.current);
+    else if (key === 'discard') c = centerOf(discardPileRef.current);
+    else if (key === 'table') c = centerOf(tableRef.current);
+    else if (key === 'human') c = centerOf(handRef.current);
+    else if (typeof key === 'string') c = centerOf(playerRefs.current[key] ?? null);
+    else c = centerOf(laidGroupRefs.current[`${key.playerId}-${key.groupIndex}`] ?? null);
+    if (c) return c;
+    // fallback
+    if (key === 'draw') return { x: root.width * 0.35, y: root.height * 0.45 };
+    if (key === 'discard') return { x: root.width * 0.65, y: root.height * 0.45 };
+    if (key === 'table') return { x: root.width * 0.5, y: root.height * 0.45 };
+    if (key === 'human') return { x: root.width * 0.5, y: root.height * 0.85 };
+    if (typeof key === 'string') return { x: root.width * 0.5, y: root.height * 0.08 };
+    return { x: root.width * 0.5, y: root.height * 0.45 };
+  };
 
   useEffect(() => {
     const el = handRef.current;
@@ -118,7 +100,6 @@ export default function App() {
   const playerRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const laidGroupRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const [handOverlap, setHandOverlap] = useState(0);
-  const [flyPos, setFlyPos] = useState<{ from: { x: number; y: number }; to: { x: number; y: number } } | null>(null);
   const positionsRef = useRef<Record<string, { x: number; y: number }>>({});
   const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard' | 'expert'>('easy');
   const [aiCount, setAiCount] = useState(1);
@@ -804,8 +785,8 @@ export default function App() {
         <motion.img
           key={flyingCard.key}
           src={cardSrc(flyingCard.card)}
-          initial={flyPos ? { left: flyPos.from.x, top: flyPos.from.y, x: '-50%', y: '-50%', scale: 0.6, opacity: 0 } : { opacity: 0 }}
-          animate={flyPos ? { left: flyPos.to.x, top: flyPos.to.y, x: '-50%', y: '-50%', scale: 1, opacity: 1 } : { opacity: 0 }}
+          initial={{ left: resolveFlyPos(flyingCard.fromPlayerId).x, top: resolveFlyPos(flyingCard.fromPlayerId).y, x: '-50%', y: '-50%', scale: 0.6, opacity: 0 }}
+          animate={{ left: resolveFlyPos(flyingCard.toTarget).x, top: resolveFlyPos(flyingCard.toTarget).y, x: '-50%', y: '-50%', scale: 1, opacity: 1 }}
           exit={{ opacity: 0, scale: 0.5 }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
           className="absolute z-50 w-16 h-22 pointer-events-none drop-shadow-2xl"
