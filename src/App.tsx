@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useGameStore } from './state/gameStore';
 import { useProgressStore } from './state/progressStore';
@@ -18,6 +18,34 @@ export default function App() {
   const { round, lastScores, gameWinner, actionLog, flyingCard, startMatch, humanDraw, humanLayPhase, humanHit, humanDiscard, reorderHand, reset } = useGameStore();
   const progress = useProgressStore();
   useEffect(() => { progress.load(); }, []);
+  useLayoutEffect(() => {
+    if (!rootRef.current) return;
+    const root = rootRef.current.getBoundingClientRect();
+    const centerOf = (el: HTMLElement | null) => {
+      if (!el) return null;
+      const r = el.getBoundingClientRect();
+      return { x: r.left - root.left + r.width / 2, y: r.top - root.top + r.height / 2 };
+    };
+    const next: Record<string, { x: number; y: number }> = {};
+    const draw = centerOf(drawPileRef.current);
+    if (draw) next['draw'] = draw;
+    const discard = centerOf(discardPileRef.current);
+    if (discard) next['discard'] = discard;
+    const table = centerOf(tableRef.current);
+    if (table) next['table'] = table;
+    Object.keys(playerRefs.current).forEach((id) => {
+      const c = centerOf(playerRefs.current[id]);
+      if (c) next[id] = c;
+    });
+    Object.keys(laidGroupRefs.current).forEach((key) => {
+      const c = centerOf(laidGroupRefs.current[key]);
+      if (c) next[key] = c;
+    });
+    const hand = centerOf(handRef.current);
+    if (hand) next['human'] = hand;
+    positionsRef.current = next;
+  });
+
   useEffect(() => {
     if (!flyingCard || !rootRef.current) { setFlyPos(null); return; }
     const root = rootRef.current.getBoundingClientRect();
@@ -26,13 +54,35 @@ export default function App() {
       const r = el.getBoundingClientRect();
       return { x: r.left - root.left + r.width / 2, y: r.top - root.top + r.height / 2 };
     };
+    const fallback = (key: string | { playerId: string; groupIndex: number }) => {
+      if (key === 'draw') return { x: root.width * 0.35, y: root.height * 0.45 };
+      if (key === 'discard') return { x: root.width * 0.65, y: root.height * 0.45 };
+      if (key === 'table') return { x: root.width * 0.5, y: root.height * 0.45 };
+      if (key === 'human') return { x: root.width * 0.5, y: root.height * 0.85 };
+      if (typeof key === 'string') return { x: root.width * 0.5, y: root.height * 0.08 };
+      return { x: root.width * 0.5, y: root.height * 0.45 };
+    };
     const resolve = (key: string | { playerId: string; groupIndex: number }) => {
-      if (key === 'draw') return centerOf(drawPileRef.current);
-      if (key === 'discard') return centerOf(discardPileRef.current);
-      if (key === 'table') return centerOf(tableRef.current);
-      if (key === 'human') return centerOf(handRef.current);
-      if (typeof key === 'string') return centerOf(playerRefs.current[key] ?? null);
-      return centerOf(laidGroupRefs.current[`${key.playerId}-${key.groupIndex}`] ?? null);
+      const k = typeof key === 'string' ? key : `${key.playerId}-${key.groupIndex}`;
+      if (positionsRef.current[k]) return positionsRef.current[k];
+      if (key === 'draw') {
+        const c = centerOf(drawPileRef.current); if (c) return c;
+      }
+      if (key === 'discard') {
+        const c = centerOf(discardPileRef.current); if (c) return c;
+      }
+      if (key === 'table') {
+        const c = centerOf(tableRef.current); if (c) return c;
+      }
+      if (key === 'human') {
+        const c = centerOf(handRef.current); if (c) return c;
+      }
+      if (typeof key === 'string') {
+        const c = centerOf(playerRefs.current[key] ?? null); if (c) return c;
+      } else {
+        const c = centerOf(laidGroupRefs.current[`${key.playerId}-${key.groupIndex}`] ?? null); if (c) return c;
+      }
+      return fallback(key);
     };
     const from = resolve(flyingCard.fromPlayerId as any);
     const to = resolve(flyingCard.toTarget as any);
@@ -69,6 +119,7 @@ export default function App() {
   const laidGroupRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const [handOverlap, setHandOverlap] = useState(0);
   const [flyPos, setFlyPos] = useState<{ from: { x: number; y: number }; to: { x: number; y: number } } | null>(null);
+  const positionsRef = useRef<Record<string, { x: number; y: number }>>({});
   const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard' | 'expert'>('easy');
   const [aiCount, setAiCount] = useState(1);
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
