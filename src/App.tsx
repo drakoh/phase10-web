@@ -114,6 +114,15 @@ export default function App() {
             onChange={(e) => setName(e.target.value)}
             placeholder={t('home.namePlaceholder')}
           />
+          <select
+            className="px-3 py-2 rounded bg-slate-800 border border-slate-700"
+            value={aiCount}
+            onChange={(e) => setAiCount(Number(e.target.value))}
+          >
+            <option value={1}>{t('home.opponents', { count: 1 })}</option>
+            <option value={2}>{t('home.opponents', { count: 2 })}</option>
+            <option value={3}>{t('home.opponents', { count: 3 })}</option>
+          </select>
 
           {/* Journey */}
           <div className="rounded-xl bg-slate-800 border border-slate-700 p-4">
@@ -141,7 +150,7 @@ export default function App() {
               disabled={progress.currentLevel >= progress.unlocked - 1 && progress.currentLevel >= LEVELS.length - 1 ? false : false}
               onClick={() => {
                 const cfg = LEVELS[progress.currentLevel];
-                startMatch({ humanName: name, difficulty: cfg.difficulty, aiCount: cfg.aiCount, targetPhases: cfg.phases });
+                startMatch({ humanName: name, difficulty: cfg.difficulty, aiCount, targetPhases: cfg.phases });
               }}
             >
               {t('home.playLevel', { n: progress.currentLevel + 1 })}
@@ -215,15 +224,6 @@ export default function App() {
                 <option value="medium">Medium</option>
                 <option value="hard">Hard</option>
                 <option value="expert">Expert</option>
-              </select>
-              <select
-                className="px-3 py-2 rounded bg-slate-800 border border-slate-700"
-                value={aiCount}
-                onChange={(e) => setAiCount(Number(e.target.value))}
-              >
-                <option value={1}>1 opponent</option>
-                <option value={2}>2 opponents</option>
-                <option value={3}>3 opponents</option>
               </select>
               <button
                 className="px-4 py-3 rounded bg-slate-700 font-semibold"
