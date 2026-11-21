@@ -10,6 +10,7 @@ import CardView, { CardBack, cardSrc } from './components/Card';
 import Legend from './components/Legend';
 import Rules from './components/Rules';
 import { toggleSound, isSoundOn } from './audio/audio';
+import { toggleMusic, isMusicOn, startMusic } from './audio/music';
 import './App.css';
 
 export default function App() {
@@ -32,6 +33,7 @@ export default function App() {
   const [name, setName] = useState('You');
   const [quickPlay, setQuickPlay] = useState(false);
   const [soundOn, setSoundOn] = useState(isSoundOn());
+  const [musicOn, setMusicOn] = useState(isMusicOn());
   const [draggedCardId, setDraggedCardId] = useState<string | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const [showLegend, setShowLegend] = useState(false);
@@ -74,6 +76,12 @@ export default function App() {
             onClick={() => setSoundOn(toggleSound())}
           >
             {soundOn ? '🔊' : '🔇'}
+          </button>
+          <button
+            className="px-2 py-1 rounded bg-slate-700 text-xs ml-2"
+            onClick={() => setMusicOn(toggleMusic())}
+          >
+            {musicOn ? '🎵' : '🎵❌'}
           </button>
           <button
             className="px-2 py-1 rounded bg-slate-700 text-xs ml-2"
@@ -151,6 +159,7 @@ export default function App() {
               disabled={progress.currentLevel >= progress.unlocked - 1 && progress.currentLevel >= LEVELS.length - 1 ? false : false}
               onClick={() => {
                 const cfg = LEVELS[progress.currentLevel];
+                startMusic();
                 startMatch({ humanName: name, difficulty: cfg.difficulty, aiCount, targetPhases: cfg.phases });
               }}
             >
@@ -228,7 +237,7 @@ export default function App() {
               </select>
               <button
                 className="px-4 py-3 rounded bg-slate-700 font-semibold"
-                onClick={() => startMatch({ humanName: name, difficulty, aiCount, targetPhases: 10 })}
+                onClick={() => { startMusic(); startMatch({ humanName: name, difficulty, aiCount, targetPhases: 10 }); }}
               >
                 {t('home.customGame')}
               </button>
@@ -664,6 +673,12 @@ export default function App() {
             onClick={() => setShowRules(true)}
           >
             {t('common.rules')}
+          </button>
+          <button
+            className="px-2 py-1 rounded bg-slate-700 text-xs"
+            onClick={() => setMusicOn(toggleMusic())}
+          >
+            {musicOn ? '🎵' : '🔇'}
           </button>
           {null}
           <button
