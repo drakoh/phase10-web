@@ -5,6 +5,7 @@ import { chooseAction } from '../engine/ai';
 import type { Difficulty } from '../engine/ai';
 import { useProgressStore } from './progressStore';
 import { playSfx } from '../audio/audio';
+import i18n from '../i18n';
 
 interface MatchConfig {
   humanName: string;
@@ -61,7 +62,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const { round } = get();
     if (!round) return;
     const r = applyAction(round, { type: 'draw', source });
-    set({ round: r, actionLog: [...get().actionLog, `You drew from ${source}`].slice(-8) });
+    set({ round: r, actionLog: [...get().actionLog, i18n.t('log.youDraw', { source: source === 'draw' ? (i18n.language === 'fr' ? 'la pile' : 'the draw pile') : (i18n.language === 'fr' ? 'la défausse' : 'the discard pile') })].slice(-8) });
     playSfx('draw');
     get().runAiTurns();
   },
@@ -72,7 +73,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const layout = canLayPhase(round, 'human');
     if (!layout) return;
     const r = applyAction(round, { type: 'layPhase', groups: layout.groups.map((g) => ({ kind: g.kind, cardIds: [...g.cards] })) });
-    set({ round: r, actionLog: [...get().actionLog, 'You laid your phase'].slice(-8) });
+    set({ round: r, actionLog: [...get().actionLog, i18n.t('log.youLay')].slice(-8) });
     playSfx('lay');
     get().runAiTurns();
   },
@@ -81,7 +82,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const { round } = get();
     if (!round) return;
     const r = applyAction(round, { type: 'hit', cardId, targetPlayerId, groupIndex });
-    set({ round: r, actionLog: [...get().actionLog, `You hit ${targetPlayerId}`].slice(-8) });
+    set({ round: r, actionLog: [...get().actionLog, i18n.t('log.youHit', { target: targetPlayerId })].slice(-8) });
     playSfx('hit');
     get().runAiTurns();
   },
@@ -92,7 +93,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const r = applyAction(round, { type: 'discard', cardId, skipTargetPlayerId });
     const discarded = round.players.find((p) => p.id === 'human')?.hand.find((c) => c.id === cardId);
     playSfx(discarded?.kind === 'skip' ? 'skip' : 'discard');
-    set({ round: r, actionLog: [...get().actionLog, `You discarded${discarded?.kind === 'skip' ? ' a Skip' : ''}`].slice(-8) });
+    set({ round: r, actionLog: [...get().actionLog, i18n.t('log.youDiscard', { skip: discarded?.kind === 'skip' ? (i18n.language === 'fr' ? ' un Passe' : ' a Skip') : '' })].slice(-8) });
     // check round over
     if (r.status === 'finished') {
       const scores = scoreRound(r);
@@ -141,7 +142,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (current.turnStep === 'draw') {
         const action = chooseAction(current, cp.id, difficulty, rng);
         current = applyAction(current, action);
-        set({ round: current, actionLog: [...get().actionLog, `${cp.name} drew`].slice(-8) });
+        set({ round: current, actionLog: [...get().actionLog, i18n.t('log.aiDraw', { name: cp.name })].slice(-8) });
         await delay(400);
       }
       // play (lay/hits) until discard
@@ -151,9 +152,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (cp2.isHuman) break;
         const action = chooseAction(current, cp2.id, difficulty, rng);
         current = applyAction(current, action);
-        const msg = action.type === 'layPhase' ? `${cp2.name} laid a phase` :
-          action.type === 'hit' ? `${cp2.name} hit` :
-          action.type === 'discard' ? `${cp2.name} discarded` : `${cp2.name} played`;
+        const msg = action.type === 'layPhase' ? i18n.t('log.aiLay', { name: cp2.name }) :
+          action.type === 'hit' ? i18n.t('log.aiHit', { name: cp2.name }) :
+          action.type === 'discard' ? i18n.t('log.aiDiscard', { name: cp2.name }) : `${cp2.name} played`;
         set({ round: current, actionLog: [...get().actionLog, msg].slice(-8) });
         await delay(action.type === 'layPhase' ? 700 : action.type === 'hit' ? 300 : 400);
         playGuard++;

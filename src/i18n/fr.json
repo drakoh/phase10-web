@@ -36,6 +36,16 @@
     "roundOver": "Manche terminée",
     "pts": "pts"
   },
+  "log": {
+    "youDraw": "Vous avez pioché dans {{source}}",
+    "youLay": "Vous avez posé votre phase",
+    "youHit": "Vous avez ajouté sur {{target}}",
+    "youDiscard": "Vous avez défaussé{{skip}}",
+    "aiDraw": "{{name}} a pioché",
+    "aiLay": "{{name}} a posé une phase",
+    "aiHit": "{{name}} a ajouté",
+    "aiDiscard": "{{name}} a défaussé"
+  },
   "common": {
     "phases": "Phases",
     "rules": "Règles",

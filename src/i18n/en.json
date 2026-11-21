@@ -36,6 +36,16 @@
     "roundOver": "Round over",
     "pts": "pts"
   },
+  "log": {
+    "youDraw": "You drew from {{source}}",
+    "youLay": "You laid your phase",
+    "youHit": "You hit {{target}}",
+    "youDiscard": "You discarded{{skip}}",
+    "aiDraw": "{{name}} drew",
+    "aiLay": "{{name}} laid a phase",
+    "aiHit": "{{name}} hit",
+    "aiDiscard": "{{name}} discarded"
+  },
   "common": {
     "phases": "Phases",
     "rules": "Rules",
